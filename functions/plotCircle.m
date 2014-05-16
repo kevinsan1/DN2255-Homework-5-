@@ -1,8 +1,7 @@
-function [ output_args ] = plotCircle(xc,yc,r,size)
+function [ output_args ] = plotCircle(xc,yc,r)
 % plotCircle = (x,y,r) 
 % (x,y) = Center Point
 % r = radius
-n = size;
 theta = 0 : 2*pi/n : 2*pi;
 x = r.*cos(theta) + xc;
 y = r.*sin(theta) + yc;

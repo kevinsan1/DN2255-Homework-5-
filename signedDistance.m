@@ -2,12 +2,12 @@ clear all;clc;close all;
 myPath = ['/Users/kevin/SkyDrive/KTH Work/',...
     'Period 3 2014/DN2255/Homework/5/'];
 addpath(genpath(myPath));
+global n; global r;global insideCircleTest;
 %% Define constants
 n = 200;
 %% Define x and y on T
-rMax = 0.3;
 theta = 0 : 2*pi/n : 2*pi;
-r = rMax;
+r = 0.3;
 xc = 0;
 yc = -0.6;
 x = r.*cos(theta) + xc;
@@ -28,10 +28,16 @@ for i = 1:(n+1)
     end
 end
 clear i j k;
-
+%% Set minDist to negative if inside circle T - (x,y)
+insideCircleTest = zeros(n+1);
+corrMinDist = testIfInsideCircle(boundaryX, boundaryY, minDist, xc, yc);
+diff = minDist - corrMinDist;
 %% Plot minDist
-% mesh(boundaryX, boundaryY,minDist)
-% hold on;
+mesh(boundaryX, boundaryY,insideCircleTest)
+hold on;
+mesh(boundaryX, boundaryY,corrMinDist)
+xlabel('x')
+ylabel('y')
 % mesh(x,y,zeros(n+1,n+1))
 % %% Plot initial circle
-% plotCircle(xc,yc,r,n);
+% plotCircle(xc,yc,r);
