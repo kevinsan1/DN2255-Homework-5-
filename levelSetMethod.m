@@ -6,7 +6,7 @@ myPath = ['/Users/kevin/SkyDrive/KTH Work/',...
 addpath(genpath(myPath));
 global n; global r; global insideCircleTest;
 %% Constants
-n = 100;
+n = 200 - 1;
 L = 2;
 dx = L/n;
 dy = dx;
@@ -19,12 +19,19 @@ v =  sin(pi*(boundaryX+1/2)) .* cos(3*pi/8*boundaryY);
 a = sqrt(u.^2 + v.^2);
 tFinal = 1.6;
 aAv = sum(sum(a))/length(a)^2;
-dt = dx/aAv;
+dt = 0.0001;
 tSteps = ceil(tFinal/dt);
 %% Signed Distance Function
 phi = zeros(n+1,n+1,tSteps+1);
 phi(:,:,1) = signedDistance;
-phi(:,:,2) = phi(:,:,1);
+phiNew = zeros(n+3,n+3,tSteps+1);
+phiNew(2:(end-1),2:(end-1),1) = phi(:,:,1);
+phiNew(1,:,1) = phiNew(2,:,1);
+phiNew(:,1,1) = phiNew(:,2,1);
+phiNew(end,:,1) = phiNew(end-1,:,1);
+phiNew(:,end,1)=phiNew(:,end-1,1);
+phi = phiNew;
+clear phiNew;
 %% Define x and y on T
 theta = 0 : 2*pi/n : 2*pi;
 xc = 0;
@@ -32,33 +39,45 @@ yc = -0.6;
 x = r.*cos(theta) + xc;
 y = r.*sin(theta) + yc;
 %% Boundary Conditions
-% 
+g = 2:(n+2);
+ip = g + 1;
+im = g - 1;
 %% Plot initial phi
-figure(1)
-mesh(boundaryX,boundaryY, phi(:,:,1))
-xlabel('x')
-ylabel('y')
+% figure(1)
+% mesh(boundaryX,boundaryY, phi(:,:,1))
+% xlabel('x')
+% ylabel('y')
 % i = 1;
 %% Set u and v
-up = u;
-um = u;
+ipvel = [1,[1:n]];
+imvel = [[2:n+1],n+1];
+up = u(ipvel,:);
+um = u(imvel,:);
 up(up<=0) = 0;
 um(um>=0) = 0;
-vp = v;
-vm = v;
+vp = v(:,imvel);vm = v(:,ipvel);
 vp(vp<=0) = 0;
 vm(vm>=0) = 0;
 %% Main loop
-for i = 2:tSteps
-    W(i-1) = (phi(:,:,i) - phi(:,:,i-1));
-    W(i+1) = (phi(:,:,i) - phi(:,:,i+1));
-    phi(:,:,i+1) = phi(:,:,i)...
-        -dt/dx * ( up(im)*W(i-1) + um(ip)*W(i+1))...
-        -dt/dy * ()
+for i = 1:tSteps
+    wxm = phi(g,g,i) - phi(im,g,i);
+    wxp = phi(g,g,i) - phi(ip,g,i);
+    wym = phi(g,g,i) - phi(g,im,i);
+    wyp = phi(g,g,i) - phi(g,ip,i);
+    phi(g,g,i+1) = phi(g,g,i)...
+        -dt/dx * ( up*wxm + um*wxp )...
+        -dt/dy * ( vp*wym + vm*wyp );
+    phi(1,:,i) 		= phi(2,:,i);
+    phi(:,1,i) 		= phi(:,2,i);
+    phi(end,:,i) 	= phi(end-1,:,i);
+    phi(:,end,i)	=phi(:,end-1,i);
     figure(3);clf;
-    mesh(boundaryX,boundaryY, phi(:,:,i))
+    mesh(boundaryX,boundaryY, phi(g,g,i))
     title(sprintf('t = %0.3g',i*dt));
-    pause(0.3)
+    pause(1)
+    if max(max(phi(:,:,i+1)))>1e2
+        break;
+    end
 end
 %% Plot final phi
 % figure(2)
