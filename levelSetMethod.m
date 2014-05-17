@@ -6,19 +6,19 @@ myPath = ['/Users/kevin/SkyDrive/KTH Work/',...
 addpath(genpath(myPath));
 global n; global r; global insideCircleTest;
 %% Constants
-n = 100 - 1;
+n = 200;
 L = 2;
-dx = L/n;
-dy = dx;
+dx = L/(n-1);
+dy = .1*dx;
 % Make grid of x and y values
 [boundaryX, boundaryY] = meshgrid(-L/2:L/n:L/2,-L/2:L/n:L/2);
 % Define velocity field
 % uext = (u,v)
-u = -cos(pi*(boundaryX+1/2)) .* sin(3*pi/8*boundaryY);
-v =  sin(pi*(boundaryX+1/2)) .* cos(3*pi/8*boundaryY);
-a = sqrt(u.^2 + v.^2);
-tFinal = 1.6;
-aAv = sum(sum(a))/length(a)^2;
+% u = -cos(pi*(boundaryX+1/2)) .* sin(3*pi/8*boundaryY);
+% v =  sin(pi*(boundaryX+1/2)) .* cos(3*pi/8*boundaryY);
+u=2+cos(2*pi*boundaryY);
+v=2+sin(2*pi*boundaryX);
+tFinal = 2;
 dt = 0.01;
 tSteps = ceil(tFinal/dt);
 %% Signed Distance Function
@@ -60,10 +60,10 @@ vp(vp<=0) = 0;
 vm(vm>=0) = 0;
 %% Main loop
 for i = 1:tSteps
-    wxm = phi(g,g,i) - phi(im,g,i);
-    wxp = phi(g,g,i) - phi(ip,g,i);
-    wym = phi(g,g,i) - phi(g,im,i);
-    wyp = phi(g,g,i) - phi(g,ip,i);
+    wxm = phi(g,g,i) - 	phi(im,g,i);	% x backward difference
+    wxp = phi(ip,g,i) - phi(g,g,i); 	% x forward difference
+    wym = phi(g,g,i) - 	phi(g,im,i); 	% y backward difference
+    wyp = phi(g,ip,i) - phi(g,g,i); 	% y forward difference
     phi(g,g,i+1) = phi(g,g,i)...
         -dt/dx * ( up*wxm + um*wxp )...
         -dt/dy * ( vp*wym + vm*wyp );

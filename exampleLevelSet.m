@@ -7,7 +7,7 @@ clear all
 close all
 N=200;         % number of grid points in one direction
 numc=1;        % number of circles for the initial condition
-R1=.5;         % initial radius of circles
+R1=.3;         % initial radius of circles
 h=2/(N-1);     % grid spacing
 dt=.1*h;       % time step
 tfin=2;       % total simulation time
@@ -34,8 +34,8 @@ axis([-1 1 -1 1])
 axis('square')
 %
 %   Initialize the velocity field
-u=-cos(pi*(x+1/2))*sin(3*pi/8*Y);
-v= sin(pi*(x+1/2))*cos(3*pi/8*Y);
+    u=2-cos(2*pi*Y);
+    v=2+sin(2*pi*X);
 %
 %      arrays for the periodic boundary conditions
 for i=1:N
