@@ -9,29 +9,29 @@ global n; global r; global insideCircleTest;
 n = 200;
 L = 2;
 dx = L/(n-1);
-dy = .1*dx;
+dy = dx;
 % Make grid of x and y values
-[boundaryX, boundaryY] = meshgrid(-L/2:L/n:L/2,-L/2:L/n:L/2);
+[X, Y] = meshgrid(-L/2:L/n:L/2,-L/2:L/n:L/2);
 % Define velocity field
 % uext = (u,v)
 % u = -cos(pi*(boundaryX+1/2)) .* sin(3*pi/8*boundaryY);
 % v =  sin(pi*(boundaryX+1/2)) .* cos(3*pi/8*boundaryY);
-u=2+cos(2*pi*boundaryY);
-v=2+sin(2*pi*boundaryX);
+u=2+cos(2*pi*Y);
+v=2+sin(2*pi*X);
 tFinal = 2;
-dt = 0.01;
+dt = 0.1*dx;
 tSteps = ceil(tFinal/dt);
 %% Signed Distance Function
 phi = zeros(n+1,n+1,tSteps+1);
 phi(:,:,1) = signedDistance;
-phiNew = zeros(n+3,n+3,tSteps+1);
-phiNew(2:(end-1),2:(end-1),1) = phi(:,:,1);
-phiNew(1,:,1) = phiNew(2,:,1);
-phiNew(:,1,1) = phiNew(:,2,1);
-phiNew(end,:,1) = phiNew(end-1,:,1);
-phiNew(:,end,1)=phiNew(:,end-1,1);
-phi = phiNew;
-clear phiNew;
+phin = zeros(n+3,n+3,tSteps+1);
+phin(2:(end-1),2:(end-1),1) = phi(:,:,1);
+phin(1,:,1) = phin(2,:,1);
+phin(:,1,1) = phin(:,2,1);
+phin(end,:,1) = phin(end-1,:,1);
+phin(:,end,1)=phin(:,end-1,1);
+phi = phin;
+phin = zeros(n+3,n+3);
 %% Define x and y on T
 theta = 0 : 2*pi/n : 2*pi;
 xc = 0;
@@ -58,18 +58,23 @@ um(um>=0) = 0;
 vp = v(:,imvel);vm = v(:,ipvel);
 vp(vp<=0) = 0;
 vm(vm>=0) = 0;
+%         Plotting
+contour(X,Y,phi(g,g,1),[0,0],'r');
+axis([-1 1 -1 1])
+axis('square')
+pause(.001)
 tic
 %% Main loop
 for tn = 1:tSteps
     for i = 2:n+2
         for j = 2:n+2
-            wxm = phi(i,j,tn) - 	phi(i-1,j,tn);	% x backward difference
-            wxp = phi(i+1,j,tn) - phi(i,j,tn); 	% x forward difference
-            wym = phi(i,j,tn) - 	phi(i,j-1,tn); 	% y backward difference
-            wyp = phi(i,j+1,tn) - phi(i,j,tn); 	% y forward difference
-            phi(i,j,tn+1) = phi(i,j,tn)...
-                -dt/dx * ( up(i-1,j-1)*wxm + um(i-1,j-1)*wxp )...
-                -dt/dy * ( vp(i-1,j-1)*wym + vm(i-1,j-1)*wyp );
+            wxm = phi(i,j,tn) - 	phi(imvel(i-1),j,tn);	% x backward difference
+            wxp = phi(ipvel(i-1),j,tn) - phi(i,j,tn); 	% x forward difference
+            wym = phi(i,j,tn) - 	phi(i,imvel(j-1),tn); 	% y backward difference
+            wyp = phi(i,ipvel(j-1),tn) - phi(i,j,tn); 	% y forward difference
+            phin(i,j) = phi(i,j,tn)...
+                -dt/dx * ( max(u(i-1,j-1),0)*wxm + min(u(i-1,j-1),0)*wxp )...
+                -dt/dy * ( max(v(i-1,j-1),0)*wym + min(v(i-1,j-1),0)*wyp );
             %             figure(3);clf;
             %             mesh(boundaryX,boundaryY, phi(i,j,tn+1))
             %             title(sprintf('t = %0.3g',tn*dt));
@@ -81,17 +86,24 @@ for tn = 1:tSteps
             end
         end
     end
-    phi(1,:,tn+1) 		= phi(2,:,tn+1);
-    phi(:,1,tn+1) 		= phi(:,2,tn+1);
-    phi(end,:,tn+1) 	= phi(end-1,:,tn+1);
-    phi(:,end,tn+1)	=phi(:,end-1,tn+1);
+    phin(1,:) 		= phin(2,:);
+    phin(:,1) 		= phin(:,2);
+    phin(end,:) 	= phin(end-1,:);
+    phin(:,end)     = phin(:,end-1);
+    phi(:,:,tn+1) = phin;
+    figure(2)
+    contour(X,Y,phi(g,g,tn),[0,0],'r');
+    axis([-1 1 -1 1])
+    axis('square')
+    pause(.001);
 end
 toc
 %% Plot final phi
-figure(2)
-for i = 1:tSteps
-    pause(0.5)
-    mesh(boundaryX,boundaryY, phi(g,g,i))
-    xlabel('x')
-    ylabel('y')
+%         Plotting
+for iPlot = 1:131
+    figure(2)
+    contour(X,Y,phi(g,g,iPlot),[0,0],'r');
+    axis([-1 1 -1 1])
+    axis('square')
+    pause(.001)
 end
