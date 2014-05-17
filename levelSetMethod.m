@@ -58,32 +58,40 @@ um(um>=0) = 0;
 vp = v(:,imvel);vm = v(:,ipvel);
 vp(vp<=0) = 0;
 vm(vm>=0) = 0;
+tic
 %% Main loop
-for i = 1:tSteps
-    wxm = phi(g,g,i) - 	phi(im,g,i);	% x backward difference
-    wxp = phi(ip,g,i) - phi(g,g,i); 	% x forward difference
-    wym = phi(g,g,i) - 	phi(g,im,i); 	% y backward difference
-    wyp = phi(g,ip,i) - phi(g,g,i); 	% y forward difference
-    phi(g,g,i+1) = phi(g,g,i)...
-        -dt/dx * ( up*wxm + um*wxp )...
-        -dt/dy * ( vp*wym + vm*wyp );
-    phi(1,:,i+1) 		= phi(2,:,i+1);
-    phi(:,1,i+1) 		= phi(:,2,i+1);
-    phi(end,:,i+1) 	= phi(end-1,:,i+1);
-    phi(:,end,i+1)	=phi(:,end-1,i+1);
-    figure(3);clf;
-    mesh(boundaryX,boundaryY, phi(g,g,i+1))
-    title(sprintf('t = %0.3g',i*dt));
-    xlabel('x');
-    ylabel('y');
-    pause(.3)
-    if max(max(phi(:,:,i+1)))>1e2
-        break;
+for tn = 1:tSteps
+    for i = 2:n+2
+        for j = 2:n+2
+            wxm = phi(i,j,tn) - 	phi(i-1,j,tn);	% x backward difference
+            wxp = phi(i+1,j,tn) - phi(i,j,tn); 	% x forward difference
+            wym = phi(i,j,tn) - 	phi(i,j-1,tn); 	% y backward difference
+            wyp = phi(i,j+1,tn) - phi(i,j,tn); 	% y forward difference
+            phi(i,j,tn+1) = phi(i,j,tn)...
+                -dt/dx * ( up(i-1,j-1)*wxm + um(i-1,j-1)*wxp )...
+                -dt/dy * ( vp(i-1,j-1)*wym + vm(i-1,j-1)*wyp );
+            %             figure(3);clf;
+            %             mesh(boundaryX,boundaryY, phi(i,j,tn+1))
+            %             title(sprintf('t = %0.3g',tn*dt));
+            %             xlabel('x');
+            %             ylabel('y');
+            %             pause(.3)
+            if max(max(phi(:,:,tn+1)))>1e2
+                break;
+            end
+        end
     end
+    phi(1,:,tn+1) 		= phi(2,:,tn+1);
+    phi(:,1,tn+1) 		= phi(:,2,tn+1);
+    phi(end,:,tn+1) 	= phi(end-1,:,tn+1);
+    phi(:,end,tn+1)	=phi(:,end-1,tn+1);
 end
+toc
 %% Plot final phi
-% figure(2)
-% for
-% mesh(boundaryX,boundaryY, phi(:,:,i))
-% xlabel('x')
-% ylabel('y')
+figure(2)
+for i = 1:tSteps
+    pause(0.5)
+    mesh(boundaryX,boundaryY, phi(g,g,i))
+    xlabel('x')
+    ylabel('y')
+end
