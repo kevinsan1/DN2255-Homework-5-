@@ -10,8 +10,8 @@ global n; global r; global insideCircleTest;
 testnumber = (x-circleX).^2 + (y-circleY).^2;
 % corrMinDist = minDist;
 % pointsInside = cell(n+1);
-for i = 1:n+1
-    for j = 1:n+1
+for i = 1:n
+    for j = 1:n
         if testnumber(i,j) <= r^2
             corrMinDist(i,j) = minDist(i,j);
             insideCircleTest(i,j) = 1;

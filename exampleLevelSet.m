@@ -53,8 +53,8 @@ for iter=1:nit
             dpx=(phi(ip(i),j)-phi(i,j))/h;                     % x forward difference
             dmy=(phi(i,j)-phi(i,im(j)))/h;                     % y backward difference
             dpy=(phi(i,ip(j))-phi(i,j))/h;                     % y forward difference
-            convx=max(u(i,j),0)*dmx+min(u(i,j),0)*dpx;
-            convy=max(v(i,j),0)*dmy+min(v(i,j),0)*dpy;
+            convx=max(u(im(i),j),0)*dmx+min(u(ip(i),j),0)*dpx;
+            convy=max(v(i,im(j)),0)*dmy+min(v(i,ip(j)),0)*dpy;
             phin(i,j)=phi(i,j)-(convx+convy)*dt;         % advance by dt
         end
     end

@@ -12,14 +12,14 @@ yc = -0.6;
 x = r.*cos(theta) + xc;
 y = r.*sin(theta) + yc;
 %% Make grid of x and y values
-[boundaryX, boundaryY] = meshgrid(-1:2/n:1,-1:2/n:1);
+[boundaryX, boundaryY] = meshgrid(-1:2/(n-1):1,-1:2/(n-1):1);
 %% Preallocation
-d = zeros(1,n+1);
-minDist = zeros(n+1,n+1);
+d = zeros(1,n);
+minDist = zeros(n,n);
 %% Get minimum distance from (boundaryX,boundaryY) to any (x,y)
-for i = 1:(n+1)
-    for k = 1:(n+1)
-        for j = 1:(n+1)
+for i = 1:(n)
+    for k = 1:(n)
+        for j = 1:(n)
             d(j) = (boundaryX(i,k) - x(j)).^2 + ...
             (boundaryY(i,k) - y(j)).^2;
         end
