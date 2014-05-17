@@ -1,8 +1,5 @@
-function b setBoundariesOfNxN = (myMatrix)
-lengthMatrix = length(myMatrix)
-b = zeros(lengthMatrix+2,lengthMatrix+2);
-b(2:lengthMatrix+1,2:lengthMatrix+1) = myMatrix;
-b(1,:) = b(2,:);
-b(:,1) = b(:,2);
-b(end,:) = b(end-1,:);
-b(:,end)=b(:,end-1);
+clearvars
+n=10;
+im = (1:n);
+setBoundariesOfNxN(im)
+% [sx,sy] = size(im);
