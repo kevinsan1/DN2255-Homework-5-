@@ -16,32 +16,20 @@ dy = dx;
 % uext = (u,v)
 % u = -cos(pi*(boundaryX+1/2)) .* sin(3*pi/8*boundaryY);
 % v =  sin(pi*(boundaryX+1/2)) .* cos(3*pi/8*boundaryY);
+
 g = 2:n+1;
-u(g,g)=2+cos(2*pi*Y);
-v(g,g)=2+sin(2*pi*X);
-u(1,:)      = u(2,:);
-u(end,:)    = u(end-1,:);
-v(1,:)      = v(2,:);
-v(end,:)    = v(end-1,:);
+u=2+cos(2*pi*Y);
+v=2+sin(2*pi*X);
+u = setBoundariesOfNxN(u);
+v = setBoundariesOfNxN(v);
 tFinal = 1;
 dt = 0.1*dx;
-tSteps = ceil(tFinal/dt);
+tSteps = 10;%ceil(tFinal/dt);
 %% Signed Distance Function
-phi = zeros(n+2,n+2);
-phi(g,g,1) = signedDistance;
-phin = zeros(n+2,n+2);
-%% Define x and y on T
-theta = 0 : 2*pi/n : 2*pi;
-xc = 0;
-yc = -0.6;
-x = r.*cos(theta) + xc;
-y = r.*sin(theta) + yc;
-%% Plot initial phi
-% figure(1)
-% mesh(boundaryX,boundaryY, phi(:,:,1))
-% xlabel('x')
-% ylabel('y')
-% i = 1;
+phi = signedDistance;
+phi = setBoundariesOfNxN(phi);
+phin = zeros(n,n);
+
 %% Set u and v
 im = [1,[1:n],n];
 ip = [2,[2:n],n];
@@ -54,21 +42,14 @@ vp(vp<=0) = 0;
 vm(vm>=0) = 0;
 %% Main loop
 for tn = 1:tSteps
-    for i = g
-        for j = g
-            wxm = phi(i,j,tn) - 	phi(im(i),j,tn);	% x backward difference
-            wxp = phi(ip(i),j,tn) - phi(i,j,tn); 	% x forward difference
-            wym = phi(i,j,tn) - 	phi(i,im(j),tn); 	% y backward difference
-            wyp = phi(i,ip(j),tn) - phi(i,j,tn); 	% y forward difference
-            phin(i,j) = phi(i,j,tn)...
-                -dt/dx * ( max(u(im(i),j),0)*wxm + min(u(ip(i),j),0)*wxp )...
-                -dt/dy * ( max(v(i,ip(j)),0)*wym + min(v(i,ip(j)),0)*wyp );
-        end
-    end
-    phin(1,:) 		= phin(2,:);
-    phin(:,1) 		= phin(:,2);
-    phin(end,:) 	= phin(end-1,:);
-    phin(:,end)     = phin(:,end-1);
+    wxm = phi(g,g,tn) - 	phi(g-1,g,tn);	% x backward difference
+    wxp = phi(g+1,g,tn) - phi(g,g,tn); 	% x forward difference
+    wym = phi(g,g,tn) - 	phi(g,g-1,tn); 	% y backward difference
+    wyp = phi(g,g+1,tn) - phi(g,g,tn); 	% y forward difference
+    phin = phi(g,g,tn)...
+        -dt/dx * ( max(u(g,g),0)*wxm + min(u(g,g),0)*wxp )...
+        -dt/dy * ( max(v(g,g),0)*wym + min(v(g,g),0)*wyp );
+    phin = setBoundariesOfNxN(phin);
     phi(:,:,tn+1) = phin;
 end
 toc
