@@ -6,7 +6,7 @@ myPath = ['/Users/kevin/SkyDrive/KTH Work/',...
 addpath(genpath(myPath));
 global n; global r; global insideCircleTest;
 %% Constants
-n = 200 - 1;
+n = 100 - 1;
 L = 2;
 dx = L/n;
 dy = dx;
@@ -19,7 +19,7 @@ v =  sin(pi*(boundaryX+1/2)) .* cos(3*pi/8*boundaryY);
 a = sqrt(u.^2 + v.^2);
 tFinal = 1.6;
 aAv = sum(sum(a))/length(a)^2;
-dt = 0.0001;
+dt = 0.01;
 tSteps = ceil(tFinal/dt);
 %% Signed Distance Function
 phi = zeros(n+1,n+1,tSteps+1);
@@ -49,10 +49,10 @@ im = g - 1;
 % ylabel('y')
 % i = 1;
 %% Set u and v
-ipvel = [1,[1:n]];
-imvel = [[2:n+1],n+1];
-up = u(ipvel,:);
-um = u(imvel,:);
+imvel = [n+1,[1:n]];
+ipvel = [[2:n+1],1];
+up = u(imvel,:);
+um = u(ipvel,:);
 up(up<=0) = 0;
 um(um>=0) = 0;
 vp = v(:,imvel);vm = v(:,ipvel);
@@ -67,14 +67,16 @@ for i = 1:tSteps
     phi(g,g,i+1) = phi(g,g,i)...
         -dt/dx * ( up*wxm + um*wxp )...
         -dt/dy * ( vp*wym + vm*wyp );
-    phi(1,:,i) 		= phi(2,:,i);
-    phi(:,1,i) 		= phi(:,2,i);
-    phi(end,:,i) 	= phi(end-1,:,i);
-    phi(:,end,i)	=phi(:,end-1,i);
+    phi(1,:,i+1) 		= phi(2,:,i+1);
+    phi(:,1,i+1) 		= phi(:,2,i+1);
+    phi(end,:,i+1) 	= phi(end-1,:,i+1);
+    phi(:,end,i+1)	=phi(:,end-1,i+1);
     figure(3);clf;
-    mesh(boundaryX,boundaryY, phi(g,g,i))
+    mesh(boundaryX,boundaryY, phi(g,g,i+1))
     title(sprintf('t = %0.3g',i*dt));
-    pause(1)
+    xlabel('x');
+    ylabel('y');
+    pause(.3)
     if max(max(phi(:,:,i+1)))>1e2
         break;
     end
