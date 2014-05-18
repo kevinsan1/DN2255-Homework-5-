@@ -36,28 +36,35 @@ axis('square')
 %   Initialize the velocity field
     u=2-cos(2*pi*Y);
     v=2+sin(2*pi*X);
+    u(1,:)=-u(2,:); u(end,:) = -u(end-1,:);
+	v(1,:)=-v(2,:); v(end,:) = -v(end-1,:);
+    phi(1,:)=phi(2,:); phi(end,:) = phi(end-1,:);
 %
 %      arrays for the periodic boundary conditions
 for i=1:N
     ip(i)=i+1;
     im(i)=i-1;
 end
-im(1)=N;
-ip(N)=1;
-%
+im(1)=1;
+ip(N)=N;
+%%
+phiIM = [2,1:N-1];
+phiIP = [2:N,N-1];
+%%
 %      begin simulation loop
 for iter=1:nit
     for i=1:N
         for j=1:N
-            dmx=(phi(i,j)-phi(im(i),j))/h;                     % x backward difference
-            dpx=(phi(ip(i),j)-phi(i,j))/h;                     % x forward difference
-            dmy=(phi(i,j)-phi(i,im(j)))/h;                     % y backward difference
-            dpy=(phi(i,ip(j))-phi(i,j))/h;                     % y forward difference
+            dmx=(phi(i,j)-phi(phiIM(i),j))/h;                     % x backward difference
+            dpx=(phi(phiIP(i),j)-phi(i,j))/h;                     % x forward difference
+            dmy=(phi(i,j)-phi(i,phiIM(j)))/h;                     % y backward difference
+            dpy=(phi(i,phiIP(j))-phi(i,j))/h;                     % y forward difference
             convx=max(u(im(i),j),0)*dmx+min(u(ip(i),j),0)*dpx;
             convy=max(v(i,im(j)),0)*dmy+min(v(i,ip(j)),0)*dpy;
             phin(i,j)=phi(i,j)-(convx+convy)*dt;         % advance by dt
         end
     end
+    phin(1,:)=phin(2,:); phin(end,:) = phin(end-1,:);
     phi=phin;                                             % update
     %
     %         Plotting
