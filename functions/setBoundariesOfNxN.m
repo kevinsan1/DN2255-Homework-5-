@@ -17,19 +17,22 @@ switch method
         [sx,sy] = size(myMatrix);
         x = zeros(sx+2,sy+2);
         x(2:sx+1,2:sy+1) = myMatrix;
-        x(1,:) = x(2,:);
-        x(:,1) = x(:,2);
+        x(1,:) = x(3,:);
+        x(:,1) = x(:,3);
         x(end,:) = x(end-1,:);
         x(:,end)=x(:,end-1);
     case 'reflective velocity BC'
         [sx,sy] = size(myMatrix);
         x = zeros(sx+2,sy+2);
         x(2:sx+1,2:sy+1) = myMatrix;
-        x(1,:) = -x(2,:);
-        x(:,1) = -x(:,2);
-        x(end,:) = -x(end-1,:);
-        x(:,end) = -x(:,end-1);
-%         disp('reflective BC');
+        x(1,:) = -x(3,:);
+        x(:,1) = -x(:,3);
+        x(end,:) = -x(end-2,:);
+        x(:,end) = -x(:,end-2);
+    case 'zeros' % zeros
+        [sx,sy] = size(myMatrix);
+        x = zeros(sx+2,sy+2);
+        x(2:sx+1,2:sy+1) = myMatrix;
 end
 
 

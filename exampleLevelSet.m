@@ -1,17 +1,15 @@
-% Level Set Functions for Certain Shapes
-%
-% Two dimensional level method for a prescribed
+%% Two dimensional level method for a prescribed
 % velocity field based on upwinding
 %
 clear all
 close all
-N=200;         % number of grid points in one direction
-numc=1;        % number of circles for the initial condition
-R1=.3;         % initial radius of circles
-h=2/(N-1);     % grid spacing
-dt=.1*h;       % time step
-tfin=2;       % total simulation time
-nit=tfin/dt;   % number of time steps
+N = 100;         % number of grid points in one direction
+numc = 1;        % number of circles for the initial condition
+R1 = .3;         % initial radius of circles
+h = 2/(N-1);     % grid spacing
+dt = .2*h;       % time step
+tfin = 1.6;       % total simulation time
+nit = tfin/dt;    % number of time steps
 x=-1:h:1;
 y=x;
 [X,Y]=meshgrid(x);
@@ -34,42 +32,39 @@ axis([-1 1 -1 1])
 axis('square')
 %
 %   Initialize the velocity field
-    u=2-cos(2*pi*Y);
-    v=2+sin(2*pi*X);
-    u(1,:)=-u(2,:); u(end,:) = -u(end-1,:);
-	v(1,:)=-v(2,:); v(end,:) = -v(end-1,:);
-    phi(1,:)=phi(2,:); phi(end,:) = phi(end-1,:);
-%
+u=-cos(pi*(X+.5)).*sin(3*pi/8*Y);
+v=sin(pi*(X+.5)).*cos(3*pi/8*Y);
+qp = 1:5:N;
 %      arrays for the periodic boundary conditions
 for i=1:N
     ip(i)=i+1;
     im(i)=i-1;
 end
-im(1)=1;
-ip(N)=N;
-%%
-phiIM = [2,1:N-1];
-phiIP = [2:N,N-1];
-%%
-%      begin simulation loop
+im(1)=N;
+ip(N)=1;
+%
+% begin simulation loop
 for iter=1:nit
     for i=1:N
         for j=1:N
-            dmx=(phi(i,j)-phi(phiIM(i),j))/h;                     % x backward difference
-            dpx=(phi(phiIP(i),j)-phi(i,j))/h;                     % x forward difference
-            dmy=(phi(i,j)-phi(i,phiIM(j)))/h;                     % y backward difference
-            dpy=(phi(i,phiIP(j))-phi(i,j))/h;                     % y forward difference
-            convx=max(u(im(i),j),0)*dmx+min(u(ip(i),j),0)*dpx;
-            convy=max(v(i,im(j)),0)*dmy+min(v(i,ip(j)),0)*dpy;
-            phin(i,j)=phi(i,j)-(convx+convy)*dt;         % advance by dt
+            dmx=(phi(i,j)-phi(im(i),j))/h; % x backward difference
+            dpx=(phi(ip(i),j)-phi(i,j))/h; % x forward difference
+            dmy=(phi(i,j)-phi(i,im(j)))/h; % y backward difference
+            dpy=(phi(i,ip(j))-phi(i,j))/h; % y forward difference
+            convx=max(u(i,j),0)*dmx+min(u(i,j),0)*dpx;
+            convy=max(v(i,j),0)*dmy+min(v(i,j),0)*dpy;
+            phin(i,j)=phi(i,j)-(convx+convy)*dt; % advance by dt
         end
     end
-    phin(1,:)=phin(2,:); phin(end,:) = phin(end-1,:);
-    phi=phin;                                             % update
+    phi=phin; % update
     %
-    %         Plotting
+    % Plotting
     contour(X,Y,phi,[0,0],'r');
+    hold on;
+    quiver(X(qp,qp),Y(qp,qp),u(qp,qp),v(qp,qp))
+    title(sprintf('t = %g', iter*dt))
     axis([-1 1 -1 1])
     axis('square')
+    hold off;
     pause(.001)
 end
