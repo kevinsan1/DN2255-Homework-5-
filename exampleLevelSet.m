@@ -17,8 +17,8 @@ y=x;
 %
 %   Initialize the level set function
 %   Union of numc randomly located circles
-a1=0;
-b1=-0.6;
+a1=2*(1-R1-h)*rand-(1-R1-h);
+b1=2*(1-R1-h)*rand-(1-R1-h);
 phi=((X-a1).*(X-a1)+(Y-b1).*(Y-b1)).^.5-R1;
 for k=1:numc-1
     a1=2*(1-R1-h)*rand-(1-R1-h);
@@ -32,10 +32,8 @@ axis([-1 1 -1 1])
 axis('square')
 %
 %   Initialize the velocity field
-%     u=2+cos(2*pi*Y);
-%     v=2+sin(2*pi*X);
-u=-cos(pi*(X+0.5)).*sin(3*pi/8*Y);
-v=sin(pi*(X+0.5)).*cos(3*pi/8*Y);
+    u=2+cos(2*pi*Y);
+    v=2+sin(2*pi*X);
 %
 %      arrays for the periodic boundary conditions
 for i=1:N
@@ -46,6 +44,7 @@ im(1)=N;
 ip(N)=1;
 q = 1:5:N;
 %
+<<<<<<< HEAD
 %      begin simulation loop
 for iter=1:nit
     for i=1:N
@@ -71,3 +70,14 @@ for iter=1:nit
     hold off;
     pause(.001)
 end
+=======
+%         Plotting
+          contour(X,Y,phi,[0,0],'r');
+          hold on;
+          quiver(X(q,q),Y(q,q),u(q,q),v(q,q))
+          axis([-1 1 -1 1])
+          axis('square')
+          hold off;
+          pause(.001)
+       end
+>>>>>>> parent of 46ff245... good, making changes I'm ip
