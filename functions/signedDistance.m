@@ -4,11 +4,11 @@ function corrMinDist = signedDistance
 global n; global r; global insideCircleTest;
 %% Define global constants
 insideCircleTest = zeros(n+1);
-r = 0.3;
+r = .3;
 %% Define x and y on T
 theta = 0 : 2*pi/n : 2*pi;
 xc = 0;
-yc = -0.6;
+yc = -.6;
 x = r.*cos(theta) + xc;
 y = r.*sin(theta) + yc;
 %% Make grid of x and y values
