@@ -70,7 +70,42 @@ for t = 1:ceil(tfinal/dt)
     xplot(:,t+1) = xT;
     yplot(:,t+1) = yT;
 end
-
+%% matrix way
+for tm = 1:10
+    for i = 1:n
+        a(i)=find(x(1,:)<=xT(i),1,'last');
+        b(i)=find(y(:,1)<=yT(i),1,'last');
+    end
+    figure(1);clf
+    plot(x(1,a),y(b,1),'.','color','r')
+    hold on;
+    plot(xT,yT,'.')
+    axis([-.4,.4,0.2,1])
+    axis('square')
+    hold off;
+    uab = ...
+        1/((xv(ip(ix))-xv(ix))*(yv(jp(jx))-yv(jx)))*...
+        (u(ix,jx)*(xv(ip(ix))-xT(istep))*(yv(jp(jx))-yT(istep)) + ...
+        u(ip(ix),jx)* (xT(istep)-xv(ix)) * (yv(jp(jx)) - yT(istep)) + ...
+        u(ix,jp(jx))*(xv(ip(ix))-xT(istep))*(yT(istep)-yv(jx)) + ...
+        u(ip(ix),jp(jx))*(xT(istep)-xv(ix))*(yT(istep)-yv(jx)));
+    vab = ...
+        1/((xv(ip(ix))-xv(ix))*(yv(jp(jx))-yv(jx)))*...
+        (v(ix,jx)*(xv(ip(ix))-xT(istep))*(yv(jp(jx))-yT(istep)) + ...
+        v(ip(ix),jx)* (xT(istep)-xv(ix)) * (yv(jp(jx)) - yT(istep)) + ...
+        v(ix,jp(jx))*(xv(ip(ix))-xT(istep))*(yT(istep)-yv(jx)) + ...
+        v(ip(ix),jp(jx))*(xT(istep)-xv(ix))*(yT(istep)-yv(jx)));
+    xTn(istep) = xT(istep) - c*dt/dx*uab;
+    yTn(istep) = yT(istep) - c*dt/dx*vab;
+end
+%%
+% xplus1 = x(:,ip);
+% xmin1 = x(:,im);
+% yplus1 = y(ip,:);
+% ymin1 = y(im,:);
+% xden = xplus1-x;
+% yden = yplus1-y;
+% uabc = 1./(xden.*yden');
 %% Plot
 q = 1:n/20:n;
 xq = x(q,q);
