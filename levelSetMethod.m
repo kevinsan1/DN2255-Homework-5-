@@ -6,9 +6,11 @@ myPath = ['/Users/kevin/SkyDrive/KTH Work/',...
     'Period 3 2014/DN2255/Homework/5/matlab/'];
 cd(myPath);
 addpath(genpath(myPath));
-global n;
+global n xc yc r;
 %% Constants
 n = 50;
+xc = 0;
+yc = -.6;
 L = 2;
 dx = L/(n-1);
 dy = dx;
