@@ -8,7 +8,7 @@ cd(myPath);
 addpath(genpath(myPath));
 global n;
 %% Constants
-n = 100;
+n = 50;
 L = 2;
 dx = L/(n-1);
 dy = dx;
@@ -129,59 +129,60 @@ end
 %     %     pause(0.1)
 % end
 %% Plot for print
-clc;clf;
-
-quivU = up(im(:),:) + um(ip(:),:);
-quivV = vp(:,im(:)) + vm(:,ip(:));
-qp = 1:round(n/25):n;
-n1 = 1;
-n2 = 4;
-n3 = 6;
-n4 = 8;
-n5 = 9;
-
-t1 = tplot(n1);
-t2 = tplot(n2);
-t3 = tplot(n3);
-t4 = tplot(n4);
-t5 = tplot(n5);
-figure('Units', 'pixels', ...
-    'Position', [100 100 500 375]);
-hold on;
-y1_plot = contour(X,Y,phiplot(:,:,n1),[0,0],'b'); % initial state
-y2_plot = contour(X,Y,phiplot(:,:,n2),[0,0],'m'); % second state
-y3_plot = contour(X,Y,phiplot(:,:,n3),[0,0],'g'); % third state
-y4_plot = contour(X,Y,phiplot(:,:,n4),[0,0],'k'); % fourth state
-y5_plot = contour(X,Y,phiplot(:,:,n5),[0,0],'r'); % final state
-quivP = quiver(X(qp,qp),Y(qp,qp),quivU(qp,qp),quivV(qp,qp),'b');
-axis([-L/2 L/2 -L/2 L/2])
-axis('square')
-hLegend = legend(gca,...
-    sprintf('t = %g s',t1),...
-    sprintf('t = %g s',t2),...
-    sprintf('t = %g s',t3),...
-    sprintf('t = %g s',t4),...
-    sprintf('t = %g s',t5),'location','Best');
-hTitle = title(sprintf('Contour Plot of $\\mathbf{\\phi}$ with velocity vectors'),'Interpreter','latex');
-hold off;
-set(gca, ...
-    'Box'         , 'off'         , ...
-    'TickDir'     , 'out'         , ...
-    'TickLength'  , [.02 .02]     , ...
-    'XMinorTick'  , 'on'          , ...
-    'YMinorTick'  , 'on'          , ...
-    'XColor'      , [.3 .3 .3]    , ...
-    'YColor'      , [.3 .3 .3]    , ...
-    'LineWidth'   , 1             );
-printYesNo = 0;
-if printYesNo == 1
-    saveFigurePath = ['/Users/kevin/SkyDrive/KTH Work/Period' ...
-        ' 3 2014/DN2255/Homework/5/Figures/'];
-    addpath(saveFigurePath);
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-depsc2', [saveFigurePath ...
-        sprintf('contourPlotOfQ1PartBbigtimestep')]);
-end
+% clc;clf;
+% 
+% quivU = up(im(:),:) + um(ip(:),:);
+% quivV = vp(:,im(:)) + vm(:,ip(:));
+% qp = 1:round(n/25):n;
+% n1 = 1;
+% n2 = 4;
+% n3 = 6;
+% n4 = 8;
+% n5 = 9;
+% 
+% t1 = tplot(n1);
+% t2 = tplot(n2);
+% t3 = tplot(n3);
+% t4 = tplot(n4);
+% t5 = tplot(n5);
+% figure('Units', 'pixels', ...
+%     'Position', [100 100 500 375]);
+% hold on;
+% y1_plot = contour(X,Y,phiplot(:,:,n1),[0,0],'b'); % initial state
+% y2_plot = contour(X,Y,phiplot(:,:,n2),[0,0],'m'); % second state
+% y3_plot = contour(X,Y,phiplot(:,:,n3),[0,0],'g'); % third state
+% y4_plot = contour(X,Y,phiplot(:,:,n4),[0,0],'k'); % fourth state
+% y5_plot = contour(X,Y,phiplot(:,:,n5),[0,0],'r'); % final state
+% quivP = quiver(X(qp,qp),Y(qp,qp),quivU(qp,qp),quivV(qp,qp),'b');
+% axis([-L/2 L/2 -L/2 L/2])
+% axis('square')
+% hLegend = legend(gca,...
+%     sprintf('t = %g s',t1),...
+%     sprintf('t = %g s',t2),...
+%     sprintf('t = %g s',t3),...
+%     sprintf('t = %g s',t4),...
+%     sprintf('t = %g s',t5),'location','Best');
+% hTitle = title(sprintf('Contour Plot of $\\mathbf{\\phi}$ with velocity vectors'),'Interpreter','latex');
+% hold off;
+% set(gca, ...
+%     'Box'         , 'off'         , ...
+%     'TickDir'     , 'out'         , ...
+%     'TickLength'  , [.02 .02]     , ...
+%     'XMinorTick'  , 'on'          , ...
+%     'YMinorTick'  , 'on'          , ...
+%     'XColor'      , [.3 .3 .3]    , ...
+%     'YColor'      , [.3 .3 .3]    , ...
+%     'LineWidth'   , 1             );
+% printYesNo = 0;
+% if printYesNo == 1
+%     saveFigurePath = ['/Users/kevin/SkyDrive/KTH Work/Period' ...
+%         ' 3 2014/DN2255/Homework/5/Figures/'];
+%     addpath(saveFigurePath);
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-depsc2', [saveFigurePath ...
+%         sprintf('contourPlotOfQ1PartBbigtimestep')]);
+%     makeTable({'dt';'dx';'n'},[dt, dx, n]','myTable.tex')
+% end
 %%
 % savePath = ['/Users/kevin/SkyDrive/'...
 %     'KTH Work/Period 3 2014/DN2255/Homework/5/matlab/mat/'];
@@ -189,4 +190,3 @@ end
 %     'X','Y','u','v','x','y','tSteps','phi','dt')
 % save([savePath sprintf('dt1-0050e-4phiplot',dt)],...
 %     'X','Y','u','v','x','y','tSteps','phiplot','dt')
-makeTable({'dt';'dx';'n'},[dt, dx, n]','myTable.tex')
