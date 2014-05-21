@@ -72,28 +72,29 @@ for t = 1:ceil(tfinal/dt)
 end
 %% matrix way
 % for tm = 1:10
-for i = 1:n
-    a(i)=find(x(1,:)<=xT(i),1,'last');
-    b(i)=find(y(:,1)<=yT(i),1,'last');
-end
-figure(1);clf
-plot(x(1,a),y(b,1),'.','color','r')
-hold on;
-plot(xT,yT,'.')
-axis([-.4,.4,0.2,1])
-axis('square')
-hold off;
-aip = [a(2:n),a(1)];
-bip = [b(2:n),b(1)];
-aim = [a(n),a(1:n-1)];
-bim = [b(n),b(1:n-1)];
+% for i = 1:n
+%     a(i)=find(x(1,:)<=xT(i),1,'last');
+%     b(i)=find(y(:,1)<=yT(i),1,'last');
+% end
+% figure(1);clf
+% plot(x(1,a),y(b,1),'.','color','r')
+% hold on;
+% plot(xT,yT,'.')
+% axis([-.4,.4,0.2,1])
+% axis('square')
+% hold off;
+% aip = [a(2:n),a(1)];
+% bip = [b(2:n),b(1)];
+% aim = [a(n),a(1:n-1)];
+% bim = [b(n),b(1:n-1)];
 %%
-u1 = diag(u(a,b))'.*(x(1,aip)-xT).*(y(bip,1)'-yT);
-u2 = diag(u(aip,b))'.* (xT-x(1,a)) .* (y(bip,1)' - yT);
-u3 = diag(u(a,bip))'.*(x(1,aip)-xT).*(yT-y(b,1)');
-u4 = diag(u(aip,bip))'.*(xT-x(1,a)).*(yT-y(b,1)');
-uab = 1./(x(1,aip)-x(1,a)).*(y(bip,1)'-y(b,1)').*...
-    (u1 + u2 + u3 + u4);
+% u1 = diag(u(a,b))'.*(x(1,aip)-xT).*(y(bip,1)'-yT);
+% u2 = diag(u(aip,b))'.* (xT-x(1,a)) .* (y(bip,1)' - yT);
+% u3 = diag(u(a,bip))'.*(x(1,aip)-xT).*(yT-y(b,1)');
+% u4 = diag(u(aip,bip))'.*(xT-x(1,a)).*(yT-y(b,1)');
+% uab = 1./((x(1,aip)-x(1,a)).*(y(bip,1)'-y(b,1)'));%.*...
+% aaaaa=    (u1' + u2' + u3' + u4');
+% uab'.*aaaaa;
 %     vab = ...
 %         1/((x(1,aip)-x(1,a))*(y(bip,1)-y(b,1))*...
 %         (v(a,b)*(x(1,aip)-xT)*(y(bip,1)-yT) + ...
