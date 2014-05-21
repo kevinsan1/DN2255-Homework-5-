@@ -17,7 +17,7 @@ dy = dx;
 % Make grid of x and y values
 [X, Y] = meshgrid(-L/2:dx:L/2,-L/2:dy:L/2);
 tFinal = 1.6;
-dt = .2*dx;
+dt = .1*dx;
 tSteps = ceil(tFinal/dt);
 ia = 1:n;
 im = [n,1:n-1];
@@ -63,7 +63,7 @@ for tn = 1:tSteps
             wyp = phi(i,ip(j)) - phi(i,j); 	% y forward difference
             fx(i,j) = up(im(i),j)*wxm + um(ip(i),j)*wxp;
             fy(i,j) = vp(i,im(j))*wym + vm(i,ip(j))*wyp;
-            phinew(i,j) = phi(i,j)-dt*( fx(i,j)/dx + fy(i,j)/dy );
+            phinew(i,j) = phi(i,j)+dt*( fx(i,j)/dx + fy(i,j)/dy );
         end
     end
     % phin = setBoundariesOfNxN(phin,phiBC);

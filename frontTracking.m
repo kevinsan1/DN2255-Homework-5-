@@ -9,8 +9,8 @@ L = 2;
 dx = L/(n-1);
 grid = -L/2:dx:L/2;
 [x,y] = meshgrid(grid,grid);
-c = .01;
-dt = 0.001*dx/c;
+c = 1;
+dt = 0.01*dx/c;
 tfinal = 1.6;
 %% Velocity Field
 u=-cos(pi*(x+0.5)).*sin(3*pi/8*y);
@@ -46,7 +46,12 @@ yT = r.*sin(theta) + yc;
 xplot(:,1) = xT;
 yplot(:,1) = yT;
 %% Advection
-for t = 1:ceil(tfinal/dt)
+q = 1:n/20:n;
+xq = x(q,q);
+yq = y(q,q);
+uq =  u(q,q);
+vq =  v(q,q);
+for t = 1:114
     for istep = 1:n
         ix = find(xv<=xT(istep),1,'last');
         jx = find(yv<=yT(istep),1,'last');
@@ -62,57 +67,28 @@ for t = 1:ceil(tfinal/dt)
             v(ip(ix),jx)* (xT(istep)-xv(ix)) * (yv(jp(jx)) - yT(istep)) + ...
             v(ix,jp(jx))*(xv(ip(ix))-xT(istep))*(yT(istep)-yv(jx)) + ...
             v(ip(ix),jp(jx))*(xT(istep)-xv(ix))*(yT(istep)-yv(jx)));
-        xTn(istep) = xT(istep) - c*dt/dx*uab;
-        yTn(istep) = yT(istep) - c*dt/dx*vab;
+        xTn(istep) = xT(istep) + c*dt/dx*uab;
+        yTn(istep) = yT(istep) + c*dt/dx*vab;
+        oxplot(istep,t) = xv(ix);
+        oyplot(istep,t) = yv(jx);
+        quplot(istep,t) = uab;
+        qvplot(istep,t) = vab;
     end
     xT = xTn;
     yT = yTn;
     xplot(:,t+1) = xT;
     yplot(:,t+1) = yT;
+    %     figure(1);
+    %     plot(oxplot,oyplot,'.',xplot(:,t),yplot(:,t),'.');
+    %     hold on;
+    %     quiver(oxplot,oyplot,quplot,qvplot);
+    %     quiver(xq,yq,uq,vq);
+    %     axis([-1,1,0,1])
+    %     axis('square')
+    %     hold off;
+    %     pause(0.001)
 end
-%% matrix way
-% for tm = 1:10
-% for i = 1:n
-%     a(i)=find(x(1,:)<=xT(i),1,'last');
-%     b(i)=find(y(:,1)<=yT(i),1,'last');
-% end
-% figure(1);clf
-% plot(x(1,a),y(b,1),'.','color','r')
-% hold on;
-% plot(xT,yT,'.')
-% axis([-.4,.4,0.2,1])
-% axis('square')
-% hold off;
-% aip = [a(2:n),a(1)];
-% bip = [b(2:n),b(1)];
-% aim = [a(n),a(1:n-1)];
-% bim = [b(n),b(1:n-1)];
-%%
-% u1 = diag(u(a,b))'.*(x(1,aip)-xT).*(y(bip,1)'-yT);
-% u2 = diag(u(aip,b))'.* (xT-x(1,a)) .* (y(bip,1)' - yT);
-% u3 = diag(u(a,bip))'.*(x(1,aip)-xT).*(yT-y(b,1)');
-% u4 = diag(u(aip,bip))'.*(xT-x(1,a)).*(yT-y(b,1)');
-% uab = 1./((x(1,aip)-x(1,a)).*(y(bip,1)'-y(b,1)'));%.*...
-% aaaaa=    (u1' + u2' + u3' + u4');
-% uab'.*aaaaa;
-%     vab = ...
-%         1/((x(1,aip)-x(1,a))*(y(bip,1)-y(b,1))*...
-%         (v(a,b)*(x(1,aip)-xT)*(y(bip,1)-yT) + ...
-%         v(aip,b)* (xT-x(1,a)) * (y(bip,1) - yT) + ...
-%         v(a,bip)*(x(1,aip)-xT)*(yT-y(b,1)) + ...
-%         v(aip,bip)*(xT-x(1,a))*(yT-y(b,1)));
-% xTn(istep) = xT(istep) - c*dt/dx*uab;
-% yTn(istep) = yT(istep) - c*dt/dx*vab;
-% end
-%%
-% xplus1 = x(:,ip);
-% xmin1 = x(:,im);
-% yplus1 = y(ip,:);
-% ymin1 = y(im,:);
-% xden = xplus1-x;
-% yden = yplus1-y;
-% uabc = 1./(xden.*yden');
-%% Plot
+%% Plot of all time figure 1
 q = 1:n/20:n;
 xq = x(q,q);
 yq = y(q,q);
@@ -120,13 +96,63 @@ uq =  u(q,q);
 vq =  v(q,q);
 figure(1);clf;
 for ix = 1:t-1
-    plot(xplot(:,ix),yplot(:,ix))
+    plot(oxplot(:,ix),oyplot(:,ix),'.',xplot(:,ix),yplot(:,ix),'.')
     hold on;
+    quiver(oxplot(:,ix),oyplot(:,ix),quplot(:,ix),qvplot(:,ix));
     quiver(xq,yq,uq,vq)
     axis([-L/2 L/2 -L/2 L/2])
     axis('square')
     hold off;
     pause(0.001)
 end
+%% Plot of discrete times figure 2
+figure(2)
+mn = 4;
+nn = 1;
+subplot(mn,nn,1) % subplot 1
+ix = 1;
+plot(oxplot(:,ix),oyplot(:,ix),'.',xplot(:,ix),yplot(:,ix),'-')
+hold on;
+quiver(oxplot(:,ix),oyplot(:,ix),quplot(:,ix),qvplot(:,ix));
+quiver(xq,yq,uq,vq)
+axis([-L/2 L/2 -L/2 L/2])
+title(sprintf('t = %g',dt*ix-dt))
+hLegend = legend('a','(x_{i}, y_{j})','c','d','location','best')
+axis('square')
+hold off;
+pause(0.001)
+subplot(mn,nn,2) % subplot 2
+ix = 25;
+plot(oxplot(:,ix),oyplot(:,ix),'.',xplot(:,ix),yplot(:,ix),'.')
+hold on;
+quiver(oxplot(:,ix),oyplot(:,ix),quplot(:,ix),qvplot(:,ix));
+quiver(xq,yq,uq,vq)
+axis([-L/2 L/2 -L/2 L/2])
+title(sprintf('t = %g',dt*ix-dt))
+axis('square')
+hold off;
+pause(0.001)
+subplot(mn,nn,3) % subplot 3
+ix = 50;
+plot(oxplot(:,ix),oyplot(:,ix),'.',xplot(:,ix),yplot(:,ix),'.')
+hold on;
+quiver(oxplot(:,ix),oyplot(:,ix),quplot(:,ix),qvplot(:,ix));
+quiver(xq,yq,uq,vq)
+axis([-L/2 L/2 -L/2 L/2])
+title(sprintf('t = %g',dt*ix-dt))
+axis('square')
+hold off;
+pause(0.001)
+subplot(mn,nn,4) % subplot 4
+ix = 100;
+plot(oxplot(:,ix),oyplot(:,ix),'.',xplot(:,ix),yplot(:,ix),'.')
+hold on;
+quiver(oxplot(:,ix),oyplot(:,ix),quplot(:,ix),qvplot(:,ix));
+quiver(xq,yq,uq,vq)
+axis([-L/2 L/2 -L/2 L/2])
+title(sprintf('t = %g',dt*ix-dt))
+axis('square')
+hold off;
+pause(0.001)
 
 
