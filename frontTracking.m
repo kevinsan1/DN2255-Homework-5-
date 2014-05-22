@@ -1,4 +1,8 @@
-clear all;clc;
+clear all;clc;close all;
+myPath = ['/Users/kevin/SkyDrive/KTH Work/',...
+    'Period 3 2014/DN2255/Homework/5/matlab/'];
+cd(myPath);
+addpath(genpath(myPath));
 global n xc yc r
 %% Definitions
 n = 100;
@@ -89,70 +93,97 @@ for t = 1:114
     %     pause(0.001)
 end
 %% Plot of all time figure 1
-q = 1:n/20:n;
-xq = x(q,q);
-yq = y(q,q);
-uq =  u(q,q);
-vq =  v(q,q);
-figure(1);clf;
-for ix = 1:t-1
-    plot(oxplot(:,ix),oyplot(:,ix),'.',xplot(:,ix),yplot(:,ix),'.')
-    hold on;
-    quiver(oxplot(:,ix),oyplot(:,ix),quplot(:,ix),qvplot(:,ix));
-    quiver(xq,yq,uq,vq)
-    axis([-L/2 L/2 -L/2 L/2])
-    axis('square')
-    hold off;
-    pause(0.001)
-end
+% q = 1:n/20:n;
+% xq = x(q,q);
+% yq = y(q,q);
+% uq =  u(q,q);
+% vq =  v(q,q);
+% figure(1);clf;
+% for ix = 1:t-1
+%     plot(oxplot(:,ix),oyplot(:,ix),'.',xplot(:,ix),yplot(:,ix),'.')
+%     hold on;
+%     quiver(oxplot(:,ix),oyplot(:,ix),quplot(:,ix),qvplot(:,ix));
+%     quiver(xq,yq,uq,vq)
+%     axis([-L/2 L/2 -L/2 L/2])
+%     axis('square')
+%     hold off;
+%     pause(0.001)
+% end
 %% Plot of discrete times figure 2
-figure(2)
-mn = 4;
-nn = 1;
-subplot(mn,nn,1) % subplot 1
+figure('Units', 'pixels', ...
+    'Position', [100 100 500 375]);
 ix = 1;
-plot(oxplot(:,ix),oyplot(:,ix),'.',xplot(:,ix),yplot(:,ix),'-')
+plot(oxplot(:,ix),oyplot(:,ix),'.')
 hold on;
 quiver(oxplot(:,ix),oyplot(:,ix),quplot(:,ix),qvplot(:,ix));
 quiver(xq,yq,uq,vq)
 axis([-L/2 L/2 -L/2 L/2])
-title(sprintf('t = %g',dt*ix-dt))
-hLegend = legend('a','(x_{i}, y_{j})','c','d','location','best')
+hTitle=title(sprintf('$t$ = %g',dt*ix-dt));
+hLegend = legend('($x_{i}, y_{j})$','$(u_{ab},v_{ab})$','(u,v)','location','best');
+set([hLegend, hTitle],'Interpreter','Latex');
 axis('square')
 hold off;
 pause(0.001)
-subplot(mn,nn,2) % subplot 2
+figure('Units', 'pixels', ...
+    'Position', [100 100 500 375]);
 ix = 25;
-plot(oxplot(:,ix),oyplot(:,ix),'.',xplot(:,ix),yplot(:,ix),'.')
+plot(oxplot(:,ix),oyplot(:,ix),'.')
 hold on;
 quiver(oxplot(:,ix),oyplot(:,ix),quplot(:,ix),qvplot(:,ix));
 quiver(xq,yq,uq,vq)
 axis([-L/2 L/2 -L/2 L/2])
-title(sprintf('t = %g',dt*ix-dt))
+hTitle = title(sprintf('$t$ = %g',dt*ix-dt));
+hLegend = legend('($x_{i}, y_{j})$','$(u_{ab},v_{ab})$','(u,v)','location','best');
+set([hLegend, hTitle],'Interpreter','Latex');
 axis('square')
 hold off;
 pause(0.001)
-subplot(mn,nn,3) % subplot 3
+figure('Units', 'pixels', ...
+    'Position', [100 100 500 375]);
 ix = 50;
-plot(oxplot(:,ix),oyplot(:,ix),'.',xplot(:,ix),yplot(:,ix),'.')
+plot(oxplot(:,ix),oyplot(:,ix),'.')
 hold on;
 quiver(oxplot(:,ix),oyplot(:,ix),quplot(:,ix),qvplot(:,ix));
 quiver(xq,yq,uq,vq)
 axis([-L/2 L/2 -L/2 L/2])
-title(sprintf('t = %g',dt*ix-dt))
+hTitle = title(sprintf('$t$ = %g',dt*ix-dt));
+hLegend = legend('($x_{i}, y_{j})$','$(u_{ab},v_{ab})$','(u,v)','location','best');
+set([hLegend, hTitle],'Interpreter','Latex');
 axis('square')
 hold off;
 pause(0.001)
-subplot(mn,nn,4) % subplot 4
+figure('Units', 'pixels', ...
+    'Position', [100 100 500 375]);
 ix = 100;
-plot(oxplot(:,ix),oyplot(:,ix),'.',xplot(:,ix),yplot(:,ix),'.')
+plot(oxplot(:,ix),oyplot(:,ix),'.')
 hold on;
 quiver(oxplot(:,ix),oyplot(:,ix),quplot(:,ix),qvplot(:,ix));
 quiver(xq,yq,uq,vq)
 axis([-L/2 L/2 -L/2 L/2])
-title(sprintf('t = %g',dt*ix-dt))
+hTitle = title(sprintf('$t$ = %g',dt*ix-dt));
+hLegend = legend('($x_{i}, y_{j})$','$(u_{ab},v_{ab})$','(u,v)','location','best');
+set([hLegend, hTitle],'Interpreter','Latex');
 axis('square')
 hold off;
 pause(0.001)
+printYesNo = 1;
+if printYesNo == 1
+    saveFigurePath = ['/Users/kevin/SkyDrive/KTH Work/Period' ...
+        ' 3 2014/DN2255/Homework/5/Figures/'];
+    addpath(saveFigurePath);
+    set(figure(1), 'PaperPositionMode', 'auto');
+    print('-depsc2', [saveFigurePath ...
+        sprintf('fronttrackingfig1')]);
+    set(figure(2), 'PaperPositionMode', 'auto');
+    print('-depsc2', [saveFigurePath ...
+        sprintf('fronttrackingfig2')]);
+    set(figure(3), 'PaperPositionMode', 'auto');
+    print('-depsc2', [saveFigurePath ...
+        sprintf('fronttrackingfig3')]);
+    set(figure(4), 'PaperPositionMode', 'auto');
+    print('-depsc2', [saveFigurePath ...
+        sprintf('fronttrackingfig4')]);
+    makeTable({'dt';'dx';'n'},[dt, dx, n]','myTablefronttracking.tex')
+end
 
 
