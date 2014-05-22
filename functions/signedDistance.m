@@ -1,10 +1,8 @@
 function corrMinDist = signedDistance
 %  	Description
 %	corrMinDist = signedDistance
-global n xc yc r insideCircleTest;
 %% Define global constants
-% insideCircleTest = zeros(n+1);
-
+global n xc yc r insideCircleTest;
 %% Define x and y on T
 theta = 0 : 2*pi/(n-1) : 2*pi;
 x = r.*cos(theta) + xc;
@@ -28,14 +26,4 @@ clear i j k;
 %% Set minDist to negative if inside circle T - (x,y)
 corrMinDist = testIfInsideCircle(boundaryX, ...
  boundaryY, minDist, xc, yc);
-%% Plot minDist
-% mesh(boundaryX, boundaryY,corrMinDist)
-% hold on;
-% mesh(boundaryX, boundaryY,minDist)
-% xlabel('x')
-% ylabel('y')
-% diff = corrMinDist - minDist;
-
-
-
 end % function
