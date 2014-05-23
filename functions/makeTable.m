@@ -3,7 +3,7 @@ function makeTable( firstColumn,secondColumn,thirdColumn,fourthColumn,fifthColum
 % Summary of this function goes here
 %   Detailed explanation goes here
     currentD = cd;
-	cd('/Users/kevin/SkyDrive/KTH Work/Period 4 2014/GNSS/Labs/L4 - Kalman filtering/matlabfiles/functions')
+	cd('/Users/kevin/SkyDrive/KTH Work/Period 3 2014/DN2255/Homework/5/Tables/')
 %% If 6 columns
 if nargin == 7
     FID = fopen(tableName, 'w');
