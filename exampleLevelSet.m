@@ -32,10 +32,10 @@ axis([-1 1 -1 1])
 axis('square')
 %
 %   Initialize the velocity field
-%     u=2+cos(2*pi*Y);
-%     v=2+sin(2*pi*X);
-u=-cos(pi*(X+0.5)).*sin(3*pi/8*Y);
-v=sin(pi*(X+0.5)).*cos(3*pi/8*Y);
+    u=2+cos(2*pi*Y);
+    v=2+sin(2*pi*X);
+% u=-cos(pi*(X+0.5)).*sin(3*pi/8*Y);
+% v=sin(pi*(X+0.5)).*cos(3*pi/8*Y);
 %
 %      arrays for the periodic boundary conditions
        for i=1:N
@@ -54,8 +54,8 @@ v=sin(pi*(X+0.5)).*cos(3*pi/8*Y);
               dpx=(phi(ip(i),j)-phi(i,j))/h;                     % x forward difference
               dmy=(phi(i,j)-phi(i,im(j)))/h;                     % y backward difference
               dpy=(phi(i,ip(j))-phi(i,j))/h;                     % y forward difference
-              convx=max(u(i,j),0)*dmx+min(u(i,j),0)*dpx;
-              convy=max(v(i,j),0)*dmy+min(v(i,j),0)*dpy;
+              convx=max(v(i,j),0)*dmx+min(v(i,j),0)*dpx;
+              convy=max(u(i,j),0)*dmy+min(u(i,j),0)*dpy;
               phin(i,j)=phi(i,j)-(convx+convy)*dt;         % advance by dt
             end
            end 

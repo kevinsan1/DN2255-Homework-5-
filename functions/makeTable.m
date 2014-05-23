@@ -47,16 +47,17 @@ else
     fprintf(FID, '      \\begin{tabular}{llllll}\\toprule \n');
     fprintf(FID, '\\multicolumn{2}{c}{Variables}\\\\ \n');
     fprintf(FID,'\\midrule \n');
-    for k=1:length(firstColumn)
-        fprintf(FID, [firstColumn{k} ' & %4.5f \\\\ '], secondColumn(k));
-        if k==length(firstColumn)
+    for k=1:length(firstColumn)-1
+        fprintf(FID, [firstColumn{k} ' & %4.4f \\\\ '], secondColumn(k));
+        if k==length(firstColumn)-1
+            fprintf(FID, [firstColumn{3} ' & %4.0f \\\\'],secondColumn(3));
             fprintf(FID, '\\bottomrule ');
         end
         fprintf(FID, '\n');
     end
     fprintf(FID, '      \\end{tabular} \n');
     fprintf(FID, '   \\end{center}\n');
-    fprintf(FID,('\\caption{The values are used for Figure~\\ref{fig:Figures_contourPlotOfQ1PartA}.} \n'));
+    fprintf(FID,('\\caption{The values are used for Figure~\\ref{fig:Figures_correctedLevelSetMethod}.} \n'));
     fprintf(FID,'\\label{tab:myTable} \n');
     fprintf(FID, '\\end{table} \n');
     fclose(FID);
