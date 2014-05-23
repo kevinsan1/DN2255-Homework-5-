@@ -11,8 +11,8 @@ dx = L/(n-1);
 dy = dx;
 % Make grid of x and y values
 [X, Y] = meshgrid(-L/2:dx:L/2,-L/2:dy:L/2);
-tFinal = .5;
-dt = .01*dx;
+tFinal = 1.8;
+dt = .2*dx;
 tSteps = ceil(tFinal/dt);
 %% Boundary Conditions
 im = [n,1:n-1]; % Periodic i-1
@@ -45,14 +45,14 @@ tplot = zeros(1,nplots+1);
 myHandle = waitbar(0,'Initializing waitbar...');
 tic;
 for tn = 1:tSteps
-    for i = 1:n
-        for j = 1:n
-            wxm = phi(i,j) - phi(im(i),j);	% x backward difference
-            wxp = phi(ip(i),j) - phi(i,j); 	% x forward difference
-            wym = phi(i,j) - phi(i,im(j)); 	% y backward difference
-            wyp = phi(i,ip(j)) - phi(i,j); 	% y forward difference
-            fx(i,j) = up(im(i),j)*wxm + um(ip(i),j)*wxp;
-            fy(i,j) = vp(i,im(j))*wym + vm(i,ip(j))*wyp;
+    for i = 2:n-1
+        for j = 2:n-1
+            wxm = phi(i,j) - phi(i-1,j);	% x backward difference
+            wxp = phi(i+1,j) - phi(i,j); 	% x forward difference
+            wym = phi(i,j) - phi(i,j-1); 	% y backward difference
+            wyp = phi(i,j+1) - phi(i,j); 	% y forward difference
+            fx(i,j) = vp(i,j)*wxm + vm(i,j)*wxp;
+            fy(i,j) = up(i,j)*wym + um(i,j)*wyp;
             phinew(i,j) = phi(i,j)-dt*( fx(i,j)/dx + fy(i,j)/dy );
         end
     end
@@ -72,7 +72,7 @@ for tn = 1:tSteps
         sprintf('%02.0f',Min) ':'...
         sprintf('%02.0f',rem(Trem,60)) ' remaining']);
 end
-%%
+%% Display motion of saved phis
 qp = 1:round(n/25):n;
 quivU = up(im(:),:) + um(ip(:),:);
 quivV = vp(:,im(:)) + vm(:,ip(:));
@@ -85,7 +85,56 @@ for iPlot = 1:iplot
     a3=quiver(X(qp,qp),Y(qp,qp),quivU(qp,qp),quivV(qp,qp));
     axis([-L/2 L/2 -L/2 L/2])
     axis('square')
-    title(sprintf('t = %0.3g',iPlot*dt));
+    title(sprintf('t = %0.3g',tplot(iplot)));
     hold off
     pause(.001);
+end
+%% Print several phis
+figure(1);clf;
+qp = 1:round(n/25):n;
+n1 = 1;
+n2 = 5;
+n3 = 10;
+n4 = 15;
+n5 = 16;
+t1 = tplot(n1); 
+t2 = tplot(n2);
+t3 = tplot(n3);
+t4 = tplot(n4);
+t5 = tplot(n5);
+figure('Units', 'pixels', ...
+    'Position', [100 100 500 375]);
+hold on;
+y1_plot = contour(X,Y,phiplot(:,:,n1),[0,0]); % initial state
+y2_plot = contour(X,Y,phiplot(:,:,n2),[0,0]); % second state
+y3_plot = contour(X,Y,phiplot(:,:,n3),[0,0]); % third state
+y4_plot = contour(X,Y,phiplot(:,:,n4),[0,0]); % fourth state
+y5_plot = contour(X,Y,phiplot(:,:,n5),[0,0]); % final state
+quivP = quiver(X(qp,qp),Y(qp,qp),quivU(qp,qp),quivV(qp,qp));
+axis([-L/2 L/2 -L/2 L/2])
+hLegend = legend(...
+    sprintf('t = %g s',t1),...
+    sprintf('t = %g s',t2),...
+    sprintf('t = %g s',t3),...
+    sprintf('t = %g s',t4),...
+    sprintf('t = %g s',t5),...
+    'location','Best');
+hTitle = title(sprintf('Contour Plot of $\\mathbf{\\phi}$ with velocity vectors'),'Interpreter','latex');
+set(gca, ...
+    'Box'         , 'off'         , ...
+    'TickDir'     , 'out'         , ...
+    'TickLength'  , [.02 .02]     , ...
+    'XMinorTick'  , 'on'          , ...
+    'YMinorTick'  , 'on'          , ...
+    'LineWidth'   , 1             );
+hold off;
+printYesNo = 0;
+if printYesNo == 1
+    saveFigurePath = ['/Users/kevin/SkyDrive/KTH Work/Period' ...
+        ' 3 2014/DN2255/Homework/5/Figures/'];
+    addpath(saveFigurePath);
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-depsc2', [saveFigurePath ...
+        sprintf('contourPlotOfQ1PartBbigtimestep')]);
+    makeTable({'dt';'dx';'n'},[dt, dx, n]','myTable.tex')
 end
