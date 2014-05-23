@@ -125,7 +125,8 @@ y2_plot = contour(X,Y,phiplot(:,:,n2),[0,0],'m'); % second state
 y3_plot = contour(X,Y,phiplot(:,:,n3),[0,0],'c'); % third state
 y4_plot = contour(X,Y,phiplot(:,:,n4),[0,0],'k'); % fourth state
 y5_plot = contour(X,Y,phiplot(:,:,n5),[0,0],'g'); % final state
-quivP = quiver(X(qp,qp),Y(qp,qp),quivU(qp,qp),quivV(qp,qp),'b');
+quivP = quiver(X(qp,qp),Y(qp,qp),quivU(qp,qp),quivV(qp,qp),...
+    'color',[.5 .5 .5]);
 axis([-L/2 L/2 -L/2 L/2])
 axis('square')
 hLegend = legend(gca,...
@@ -147,7 +148,7 @@ set(gca, ...
     'YColor'      , [.3 .3 .3]    , ...
     'LineWidth'   , 1             );
 hold off;
-printYesNo = 1;
+printYesNo = 0;
 if printYesNo == 1
     saveFigurePath = ['/Users/kevin/SkyDrive/KTH Work/Period' ...
         ' 3 2014/DN2255/Homework/5/Figures/'];
