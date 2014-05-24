@@ -7,10 +7,10 @@ function [dt,dx] = levelSetMethod(dtfraction,myTextLabel)
 %	none =
 global n xc yc r;
 % Long description
-if nargin < 1
-	L = 2;
-	dx = L/(n-1);
-	dt = 0.1*dx;
+if nargin < 2
+    n=100;
+	dtfraction = 0.1;
+    myTextLabel = 'no label given';
 end
 %% Level Set Method
 % phi_t + u_{ext} * phi_x = 0
@@ -76,27 +76,6 @@ for tn = 1:tSteps
         tplot(iplot) = dt*tn;
     end
 end
-
-%%
-% qp = 1:round(n/25):n;
-% % u=2-cos(pi*(X+0.5)).*sin(3*pi/8*Y);
-% % v=2+sin(pi*(X+0.5)).*cos(3*pi/8*Y);
-% quivU = up(im(:),:) + um(ip(:),:);
-% quivV = vp(:,im(:)) + vm(:,ip(:));
-% figure(1);clf;
-% for iPlot = 1:iplot
-%     figure(1)
-%     a1=contour(X,Y,phiplot(:,:,iPlot),[0,0],'r');
-%     hold on;
-%     a2=contour(X,Y,phiplot(:,:,1),[0,0],'b');
-%     a3=quiver(X(qp,qp),Y(qp,qp),quivU(qp,qp),quivV(qp,qp));
-%     axis([-L/2 L/2 -L/2 L/2])
-%     axis('square')
-%     title(sprintf('t = %0.3g',iPlot*dt));
-%     hold off
-%     pause(.001);
-% end
-
 %% Plot for print
 
 quivU = up(im(:),:) + um(ip(:),:);
@@ -115,20 +94,20 @@ t4 = tplot(n4);
 t5 = tplot(n5);
 figure1=figure('Units', 'pixels', ...
     'Position', [100 100 500 375]);clf;hold on;
-quivP = quiver(X(qp,qp),Y(qp,qp),quivU(qp,qp),quivV(qp,qp),...
-    'color',[.5 .5 .5]);
 y1_plot = contour(X,Y,phiplot(:,:,n1),[0,0],'r'); % initial state
 y2_plot = contour(X,Y,phiplot(:,:,n2),[0,0],'m'); % second state
 y3_plot = contour(X,Y,phiplot(:,:,n3),[0,0],'color',[.2 .5 .9]); % third state
 y4_plot = contour(X,Y,phiplot(:,:,n4),[0,0],'b'); % fourth state
 y5_plot = contour(X,Y,phiplot(:,:,n5),[0,0],'color',[.3 .3 .3]); % final state
+quivP = quiver(X(qp,qp),Y(qp,qp),quivU(qp,qp),quivV(qp,qp),...
+    'color',[.5 .5 .5]);
 axis([-L/2 L/2 -L/2 L/2])
 axis('square')
 hXLabel = xlabel('x');
 hYLabel = ylabel('y');
 % Create axes
 hText = text(-0.95,0,...
-    sprintf(['n = %g\ndt = ' myTextLabel ' = %4.4f\ndx = L/(N-1) = %4.4f'],n,dt,dx),...
+    [sprintf('n = %g\n\\Deltat = ',n) myTextLabel sprintf(' = %4.4f\n\\Deltax = L/(N-1) = %4.4f',dt,dx)],...
     'EdgeColor',[0 0 0],...
     'BackgroundColor',[1 1 1]);
 hLegend = legend(gca,...
