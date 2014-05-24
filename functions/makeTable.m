@@ -38,19 +38,20 @@ if nargin == 7
     fprintf(FID, '\\end{table} \n');
     fclose(FID);
 else
-    tableName = thirdColumn;
-    t = num2cell([1,2,3,4]);
-    [thirdColumn,fourthColumn,fifthColumn,sixthColumn] = deal(t{:});
+    
+    tableName = fourthColumn;
+    t = num2cell([4,5,6]);
+    [fourthColumn,fifthColumn,sixthColumn] = deal(t{:});
     FID = fopen(tableName, 'w');
     fprintf(FID, '\\begin{table}[h] \n');
     fprintf(FID, '   \\begin{center} \n');
-    fprintf(FID, '      \\begin{tabular}{llllll}\\toprule \n');
-    fprintf(FID, '\\multicolumn{2}{c}{Variables}\\\\ \n');
+    fprintf(FID, '      \\begin{tabular}{llr}\\toprule \n');
+    fprintf(FID, 'Parameter & Expression & Value\\\\ \n');
     fprintf(FID,'\\midrule \n');
     for k=1:length(firstColumn)-1
-        fprintf(FID, [firstColumn{k} ' & %4.4f \\\\ '], secondColumn(k));
+        fprintf(FID, [firstColumn{k} '&' secondColumn{k} ' & %4.4f \\\\ '], thirdColumn(k));
         if k==length(firstColumn)-1
-            fprintf(FID, [firstColumn{3} ' & %4.0f \\\\'],secondColumn(3));
+            fprintf(FID, [firstColumn{3} '&' secondColumn{3} ' & %4.0f \\\\'],thirdColumn(3));
             fprintf(FID, '\\bottomrule ');
         end
         fprintf(FID, '\n');
