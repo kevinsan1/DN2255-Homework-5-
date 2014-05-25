@@ -1,4 +1,4 @@
-clear all;clc;close all;
+clearvars;clc;
 myPath = ['/Users/kevin/SkyDrive/KTH Work/',...
     'Period 3 2014/DN2255/Homework/5/matlab/'];
 cd(myPath);
@@ -14,8 +14,8 @@ dx = L/(n-1);
 vec = -L/2:dx:L/2;
 [y,x] = meshgrid(vec,vec);
 c = 1;
-dt = 0.1*dx;
-tfinal = 1.6;
+dt = 1*dx;
+tfinal = 2;
 totStep = ceil(tfinal/dt);
 %% Velocity Field
 u=-cos(pi*(x+0.5)).*sin(3*pi/8*y);
@@ -28,8 +28,9 @@ xT = r.*cos(theta) + xc;
 yT = r.*sin(theta) + yc;
 xplot(:,1) = xT;
 yplot(:,1) = yT;
-for tstep = 1:ceil(tfinal/dt);
-    for istep = 1:n
+
+for tstep = 1:totStep;
+    for istep = 2:n-1
         a = xT(istep);
         b = yT(istep);
         ix = find(xv<=a,1,'last');
@@ -53,8 +54,18 @@ for tstep = 1:ceil(tfinal/dt);
         quplot(istep,tstep) = vab;
         qvplot(istep,tstep) = uab;
     end
+    xTn(1,tstep) = xTn(n-1,tstep);
+    yTn(1,tstep) = yTn(n-1,tstep);
+    xTn(n,tstep) = xTn(2,tstep);
+    yTn(n,tstep) = yTn(2,tstep);
     xT = xTn(:,tstep)';
     yT = yTn(:,tstep)';
+%     quiver(xq,yq,uq,vq)
+%     hold on;
+%     plot(xTn(:,tstep),yTn(:,tstep));
+%     axis([-L/2 L/2 -L/2 L/2])
+%     axis('square')
+%     hold off
 end
 
 %% Plot of all time figure 1
@@ -64,14 +75,14 @@ yq = y(q,q);
 uq =  u(q,q);
 vq =  v(q,q);
 figure(1);clf;
-for ipp = 1:ceil(tfinal/dt);
+for ipp = 1:4:tstep-1;
     quiver(xq,yq,uq,vq)
     hold on;
     plot(xTn(:,ipp),yTn(:,ipp));
     axis([-L/2 L/2 -L/2 L/2])
     axis('square')
     hold off;
-    pause(0.001)
+    pause(0.1);
 end
 title('plot finished');
 %% Plot of discrete times figure 2
@@ -86,17 +97,24 @@ t2 = dt*n2;
 t3 = dt*n3;
 t4 = dt*n4;
 t5 = dt*n5;
-figure('Units', 'pixels', ...
-    'Position', [100 100 500 375]);
-plot(xTn(:,n1),yTn(:,n1),...
+figure1;
+hold on;
+plot( ...
+	xTn(:,n1),yTn(:,n1),...
     xTn(:,n2),yTn(:,n2),...
     xTn(:,n3),yTn(:,n3),...
     xTn(:,n4),yTn(:,n4),...
     xTn(:,n5),yTn(:,n5))
 hold on;
+hXLabel = xlabel('x');
+hYLabel = ylabel('y');
 quiver(xq,yq,uq,vq)
 axis([-L/2 L/2 -L/2 L/2])
 axis('square')
+hText = text(-0.95,0,...
+    [sprintf('N = %g\n\\Deltat = 0.1\\Deltax',n) sprintf(' = %4.4f\n\\Deltax = L/(N-1) = %4.4f',dt,dx)],...
+    'EdgeColor',[0 0 0],...
+    'BackgroundColor',[1 1 1]);
 hLegend = legend(gca,...
     sprintf('t = %0.2f s',t1),...
     sprintf('t = %0.2f s',t2),...
@@ -106,12 +124,24 @@ hLegend = legend(gca,...
 hTitle = title(['Contour Plot of '...
     sprintf('$\\mathbf{\\phi}$ with velocity vectors')],...
     'Interpreter','latex');
+set( gca                       , ...
+    'FontName'   , 'Helvetica' );
+set([hTitle, hXLabel, hYLabel, hText], ...
+    'FontName'   , 'AvantGarde');
+set([hLegend, gca]             , ...
+    'FontSize'   , 8           );
+set([hXLabel, hYLabel, hText]  , ...
+    'FontSize'   , 10          );
+set( hTitle                    , ...
+    'FontSize'   , 12          , ...
+    'FontWeight' , 'bold'      );
 set(gca, ...
     'Box'         , 'off'         , ...
     'TickDir'     , 'out'         , ...
     'TickLength'  , [.02 .02]     , ...
     'XMinorTick'  , 'on'          , ...
     'YMinorTick'  , 'on'          , ...
+    'YGrid'       , 'on',...
     'XColor'      , [.3 .3 .3]    , ...
     'YColor'      , [.3 .3 .3]    , ...
     'LineWidth'   , 1             );
@@ -123,7 +153,6 @@ if printYesNo == 1
     addpath(saveFigurePath);
     set(gcf, 'PaperPositionMode', 'auto');
     print('-depsc2', [saveFigurePath ...
-        sprintf('correctedLevelSetMethod')]);
-    makeTable({'dt';'dx';'n'},[dt, dx, n]','myTable.tex')
+        sprintf('frontTracking')]);
 end
 

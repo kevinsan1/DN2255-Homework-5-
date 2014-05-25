@@ -1,16 +1,16 @@
-function [dt,dx] = levelSetMethod(dtfraction,myTextLabel)
+function [dt,dx,phiplot,X,Y,tplot,figure1] = levelSetMethod(dtfraction,myTextLabel)
 %  	Description
 %	out = levelSetMethod(n,dt,none,none)
 %   n = number of grids
-%	dt = 
+%	dt =
 %	none =
 %	none =
 global n xc yc r;
 % Long description
 if nargin < 2
     n=100;
-	dtfraction = 0.1;
-    myTextLabel = 'no label given';
+    dtfraction = 0.1;
+    myTextLabel = '0.1';
 end
 %% Level Set Method
 % phi_t + u_{ext} * phi_x = 0
@@ -48,14 +48,13 @@ nplots = 20;        % Desired number of plots
 plotStep = round(tSteps/nplots); % Number of steps between plots
 iplot = 1;
 tplot(1) = 0;
+phinew = phi;
 phiplot(:,:,1) = phi;
-%% Initialize variables
 fx = zeros(n);
 fy = zeros(n);
-phinew = zeros(n);
-tplot = zeros(1,nplots+1);
-phiplot = zeros(n,n,nplots+1);
-phiplot = phi;
+% tplot = zeros(1,nplots);
+myHandle = waitbar(0,'Initializing waitbar...');
+tic;
 %% Main loop
 for tn = 1:tSteps
     for i = 2:n-1
@@ -69,23 +68,34 @@ for tn = 1:tSteps
             phinew(i,j) = phi(i,j)-dt*( fx(i,j)/dx + fy(i,j)/dy );
         end
     end
+    % Set Boundary Conditions (no flux)
+    phinew(1,:) = phinew(2,:);
+    phinew(:,1) = phinew(:,2);
+    phinew(n,:) = phinew(n-1,:);
+    phinew(:,n) = phinew(:,n-1);
     phi = phinew;
-    if( rem(tn,plotStep) < 1 ) % Every plot_iter steps record
-        iplot = iplot+1;
-        phiplot(:,:,iplot) = phi; % Record phi(i) for ploting
-        tplot(iplot) = dt*tn;
-    end
+    phiplot(:,:,tn+1) = phi; 
+    tplot(tn) = dt*tn;
+        %% Here's the progress bar code
+    time=toc;
+    Perc=tn/tSteps;
+    Trem=time/Perc-time; %Calculate the time remaining
+    Hrs=floor(Trem/3600);Min=floor((Trem-Hrs*3600)/60);
+    waitbar(Perc,myHandle,[sprintf('%0.1f',Perc*100) '%, '...
+        sprintf('%03.0f',Hrs) ':'...
+        sprintf('%02.0f',Min) ':'...
+        sprintf('%02.0f',rem(Trem,60)) ' remaining Level Set Method']);
 end
 %% Plot for print
 
-quivU = up(im(:),:) + um(ip(:),:);
-quivV = vp(:,im(:)) + vm(:,ip(:));
-qp = 1:round(n/25):n;
+
+qp = 1:round(n/20):n;
+totTime=length(tplot);
 n1 = 1;
-n2 = 5;
-n3 = 10;
-n4 = 15;
-n5 = 20;
+n2 = round(1/4*totTime);
+n3 = round(.5*totTime);
+n4 = round(3/4*totTime);
+n5 = totTime;
 
 t1 = tplot(n1);
 t2 = tplot(n2);
@@ -93,13 +103,13 @@ t3 = tplot(n3);
 t4 = tplot(n4);
 t5 = tplot(n5);
 figure1=figure('Units', 'pixels', ...
-    'Position', [100 100 500 375]);clf;hold on;
+    'Position', [100 100 500 375]);hold on;
 y1_plot = contour(X,Y,phiplot(:,:,n1),[0,0],'r'); % initial state
 y2_plot = contour(X,Y,phiplot(:,:,n2),[0,0],'m'); % second state
 y3_plot = contour(X,Y,phiplot(:,:,n3),[0,0],'color',[.2 .5 .9]); % third state
 y4_plot = contour(X,Y,phiplot(:,:,n4),[0,0],'b'); % fourth state
 y5_plot = contour(X,Y,phiplot(:,:,n5),[0,0],'color',[.3 .3 .3]); % final state
-quivP = quiver(X(qp,qp),Y(qp,qp),quivU(qp,qp),quivV(qp,qp),...
+quivP = quiver(X(qp,qp),Y(qp,qp),u(qp,qp),v(qp,qp),...
     'color',[.5 .5 .5]);
 axis([-L/2 L/2 -L/2 L/2])
 axis('square')
@@ -107,7 +117,7 @@ hXLabel = xlabel('x');
 hYLabel = ylabel('y');
 % Create axes
 hText = text(-0.95,0,...
-    [sprintf('n = %g\n\\Deltat = ',n) myTextLabel sprintf(' = %4.4f\n\\Deltax = L/(N-1) = %4.4f',dt,dx)],...
+    [sprintf('N = %g\n\\Deltat = ',n) myTextLabel sprintf(' = %4.4f\n\\Deltax = L/(N-1) = %4.4f',dt,dx)],...
     'EdgeColor',[0 0 0],...
     'BackgroundColor',[1 1 1]);
 hLegend = legend(gca,...
@@ -131,15 +141,15 @@ set( hTitle                    , ...
     'FontSize'   , 12          , ...
     'FontWeight' , 'bold'      );
 set(gca, ...
-  'Box'         , 'off'         , ...
-  'TickDir'     , 'out'         , ...
-  'TickLength'  , [.02 .02]     , ...
-  'XMinorTick'  , 'on'          , ...
-  'YMinorTick'  , 'on'          , ...
-  'YGrid'       , 'on'          , ...
-  'XColor'      , [.3 .3 .3]    , ...
-  'YColor'      , [.3 .3 .3]    , ...
-  'LineWidth'   , 1             );
+    'Box'         , 'off'         , ...
+    'TickDir'     , 'out'         , ...
+    'TickLength'  , [.02 .02]     , ...
+    'XMinorTick'  , 'on'          , ...
+    'YMinorTick'  , 'on'          , ...
+    'YGrid'     ,'on',...
+    'XColor'      , [.3 .3 .3]    , ...
+    'YColor'      , [.3 .3 .3]    , ...
+    'LineWidth'   , 1             );
 hold off;
 %%
 % savePath = ['/Users/kevin/SkyDrive/'...

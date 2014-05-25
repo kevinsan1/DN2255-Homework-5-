@@ -1,4 +1,4 @@
-function corrMinDist = testIfInsideCircle(x,y,minDist,circleX, circleY)
+function corrMinDist = testIfInsideCircle(x,y,minDist)
 %  	Description
 %	corrMinDist = testIfInsideCircle(x)
 %   x = grid points
@@ -6,8 +6,9 @@ function corrMinDist = testIfInsideCircle(x,y,minDist,circleX, circleY)
 %   circleX = x center of circle
 %   circleY = y center of circle
 %	minDist = min distance from x to xc and y to yc
-global n; global r; global insideCircleTest;
-testnumber = (x-circleX).^2 + (y-circleY).^2;
+global n r insideCircleTest yc xc;
+
+testnumber = (x-xc).^2 + (y-yc).^2;
 % corrMinDist = minDist;
 % pointsInside = cell(n+1);
 for i = 1:n
@@ -20,4 +21,4 @@ for i = 1:n
         end
     end
 end
-end % function
+
