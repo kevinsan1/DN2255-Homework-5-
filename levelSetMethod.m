@@ -1,10 +1,7 @@
+%% Level Set Method
+% 
+%%
 function [dt,dx,phiplot,X,Y,tplot,figure1] = levelSetMethod(dtfraction,myTextLabel)
-%  	Description
-%	out = levelSetMethod(n,dt,none,none)
-%   n = number of grids
-%	dt =
-%	none =
-%	none =
 global n xc yc r;
 % Long description
 if nargin < 2
@@ -12,8 +9,6 @@ if nargin < 2
     dtfraction = 0.1;
     myTextLabel = '0.1';
 end
-%% Level Set Method
-% phi_t + u_{ext} * phi_x = 0
 %% Constants
 xc = 0;
 yc = -.6;

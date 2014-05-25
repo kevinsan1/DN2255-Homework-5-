@@ -1,0 +1,384 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Matlab Code</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-05-25"><meta name="DC.source" content="frontTracking.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Matlab Code</h1><!--introduction--><p>Front tracking Method</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Definitions</a></li><li><a href="#3">Velocity Field</a></li><li><a href="#4">Define x and y on T</a></li><li><a href="#5">Plot of all time figure 1</a></li><li><a href="#6">Plot of discrete times figure 2</a></li></ul></div><pre class="codeinput">clearvars;clc;
+myPath = [<span class="string">'/Users/kevin/SkyDrive/KTH Work/'</span>,<span class="keyword">...</span>
+    <span class="string">'Period 3 2014/DN2255/Homework/5/matlab/'</span>];
+cd(myPath);
+addpath(genpath(myPath));
+<span class="keyword">global</span> n xc yc r
+</pre><h2>Definitions<a name="2"></a></h2><pre class="codeinput">n = 100;
+xc = 0;
+yc = -0.6;
+r = 0.3;
+L = 2;
+dx = L/(n-1);
+vec = -L/2:dx:L/2;
+[y,x] = meshgrid(vec,vec);
+c = 1;
+dt = 1*dx;
+tfinal = 2;
+totStep = ceil(tfinal/dt);
+</pre><h2>Velocity Field<a name="3"></a></h2><pre class="codeinput">u=-cos(pi*(x+0.5)).*sin(3*pi/8*y);
+v=sin(pi*(x+0.5)).*cos(3*pi/8*y);
+xv = vec;
+yv = vec;
+</pre><h2>Define x and y on T<a name="4"></a></h2><pre class="codeinput">theta = 0 : 2*pi/(n-1) : 2*pi;
+xT = r.*cos(theta) + xc;
+yT = r.*sin(theta) + yc;
+xplot(:,1) = xT;
+yplot(:,1) = yT;
+
+<span class="keyword">for</span> tstep = 1:totStep;
+    <span class="keyword">for</span> istep = 2:n-1
+        a = xT(istep);
+        b = yT(istep);
+        ix = find(xv&lt;=a,1,<span class="string">'last'</span>);
+        jx = find(yv&lt;=b,1,<span class="string">'last'</span>);
+        uab = <span class="keyword">...</span>
+            1/((xv(ix+1)-xv(ix))*(yv(jx+1)-yv(jx)))*<span class="keyword">...</span>
+            (u(ix,jx)*(xv(ix+1)-a)*(yv(jx+1)-b) + <span class="keyword">...</span>
+            u(ix+1,jx)* (a-xv(ix)) * (yv(jx+1) - b) + <span class="keyword">...</span>
+            u(ix,jx+1)*(xv(ix+1)-a)*(b-yv(jx)) + <span class="keyword">...</span>
+            u(ix+1,jx+1)*(a-xv(ix))*(b-yv(jx)));
+        vab = <span class="keyword">...</span>
+            1/((xv(ix+1)-xv(ix))*(yv(jx+1)-yv(jx)))*<span class="keyword">...</span>
+            (v(ix,jx)*(xv(ix+1)-a)*(yv(jx+1)-b) + <span class="keyword">...</span>
+            v(ix+1,jx)* (a-xv(ix)) * (yv(jx+1) - b) + <span class="keyword">...</span>
+            v(ix,jx+1)*(xv(ix+1)-a)*(b-yv(jx)) + <span class="keyword">...</span>
+            v(ix+1,jx+1)*(a-xv(ix))*(b-yv(jx)));
+        xTn(istep,tstep) = xT(istep) + c*dt*uab;
+        yTn(istep,tstep) = yT(istep) + c*dt*vab;
+        oxplot(istep,tstep) = xv(ix);
+        oyplot(istep,tstep) = yv(jx);
+        quplot(istep,tstep) = vab;
+        qvplot(istep,tstep) = uab;
+    <span class="keyword">end</span>
+    xTn(1,tstep) = xTn(n-1,tstep);
+    yTn(1,tstep) = yTn(n-1,tstep);
+    xTn(n,tstep) = xTn(2,tstep);
+    yTn(n,tstep) = yTn(2,tstep);
+    xT = xTn(:,tstep)';
+    yT = yTn(:,tstep)';
+<span class="comment">%     quiver(xq,yq,uq,vq)</span>
+<span class="comment">%     hold on;</span>
+<span class="comment">%     plot(xTn(:,tstep),yTn(:,tstep));</span>
+<span class="comment">%     axis([-L/2 L/2 -L/2 L/2])</span>
+<span class="comment">%     axis('square')</span>
+<span class="comment">%     hold off</span>
+<span class="keyword">end</span>
+</pre><h2>Plot of all time figure 1<a name="5"></a></h2><pre class="codeinput">q = 1:n/20:n;
+xq = x(q,q);
+yq = y(q,q);
+uq =  u(q,q);
+vq =  v(q,q);
+figure(1);clf;
+<span class="keyword">for</span> ipp = 1:4:tstep-1;
+    quiver(xq,yq,uq,vq)
+    hold <span class="string">on</span>;
+    plot(xTn(:,ipp),yTn(:,ipp));
+    axis([-L/2 L/2 -L/2 L/2])
+    axis(<span class="string">'square'</span>)
+    hold <span class="string">off</span>;
+    pause(0.1);
+<span class="keyword">end</span>
+title(<span class="string">'plot finished'</span>);
+</pre><h2>Plot of discrete times figure 2<a name="6"></a></h2><pre class="codeinput">n1 = 1;
+n2 = round(totStep/4  );
+n3 = round(totStep/2  );
+n4 = round(totStep*3/4);
+n5 = totStep;
+
+t1 = dt*n1;
+t2 = dt*n2;
+t3 = dt*n3;
+t4 = dt*n4;
+t5 = dt*n5;
+figure1;
+hold <span class="string">on</span>;
+plot( <span class="keyword">...</span>
+	xTn(:,n1),yTn(:,n1),<span class="keyword">...</span>
+    xTn(:,n2),yTn(:,n2),<span class="keyword">...</span>
+    xTn(:,n3),yTn(:,n3),<span class="keyword">...</span>
+    xTn(:,n4),yTn(:,n4),<span class="keyword">...</span>
+    xTn(:,n5),yTn(:,n5))
+hold <span class="string">on</span>;
+hXLabel = xlabel(<span class="string">'x'</span>);
+hYLabel = ylabel(<span class="string">'y'</span>);
+quiver(xq,yq,uq,vq)
+axis([-L/2 L/2 -L/2 L/2])
+axis(<span class="string">'square'</span>)
+hText = text(-0.95,0,<span class="keyword">...</span>
+    [sprintf(<span class="string">'N = %g\n\\Deltat = 0.1\\Deltax'</span>,n) sprintf(<span class="string">' = %4.4f\n\\Deltax = L/(N-1) = %4.4f'</span>,dt,dx)],<span class="keyword">...</span>
+    <span class="string">'EdgeColor'</span>,[0 0 0],<span class="keyword">...</span>
+    <span class="string">'BackgroundColor'</span>,[1 1 1]);
+hLegend = legend(gca,<span class="keyword">...</span>
+    sprintf(<span class="string">'t = %0.2f s'</span>,t1),<span class="keyword">...</span>
+    sprintf(<span class="string">'t = %0.2f s'</span>,t2),<span class="keyword">...</span>
+    sprintf(<span class="string">'t = %0.2f s'</span>,t3),<span class="keyword">...</span>
+    sprintf(<span class="string">'t = %0.2f s'</span>,t4),<span class="keyword">...</span>
+    sprintf(<span class="string">'t = %0.2f s'</span>,t5),<span class="string">'location'</span>,<span class="string">'SouthEast'</span>);
+hTitle = title([<span class="string">'Contour Plot of '</span><span class="keyword">...</span>
+    sprintf(<span class="string">'$\\mathbf{\\phi}$ with velocity vectors'</span>)],<span class="keyword">...</span>
+    <span class="string">'Interpreter'</span>,<span class="string">'latex'</span>);
+set( gca                       , <span class="keyword">...</span>
+    <span class="string">'FontName'</span>   , <span class="string">'Helvetica'</span> );
+set([hTitle, hXLabel, hYLabel, hText], <span class="keyword">...</span>
+    <span class="string">'FontName'</span>   , <span class="string">'AvantGarde'</span>);
+set([hLegend, gca]             , <span class="keyword">...</span>
+    <span class="string">'FontSize'</span>   , 8           );
+set([hXLabel, hYLabel, hText]  , <span class="keyword">...</span>
+    <span class="string">'FontSize'</span>   , 10          );
+set( hTitle                    , <span class="keyword">...</span>
+    <span class="string">'FontSize'</span>   , 12          , <span class="keyword">...</span>
+    <span class="string">'FontWeight'</span> , <span class="string">'bold'</span>      );
+set(gca, <span class="keyword">...</span>
+    <span class="string">'Box'</span>         , <span class="string">'off'</span>         , <span class="keyword">...</span>
+    <span class="string">'TickDir'</span>     , <span class="string">'out'</span>         , <span class="keyword">...</span>
+    <span class="string">'TickLength'</span>  , [.02 .02]     , <span class="keyword">...</span>
+    <span class="string">'XMinorTick'</span>  , <span class="string">'on'</span>          , <span class="keyword">...</span>
+    <span class="string">'YMinorTick'</span>  , <span class="string">'on'</span>          , <span class="keyword">...</span>
+    <span class="string">'YGrid'</span>       , <span class="string">'on'</span>,<span class="keyword">...</span>
+    <span class="string">'XColor'</span>      , [.3 .3 .3]    , <span class="keyword">...</span>
+    <span class="string">'YColor'</span>      , [.3 .3 .3]    , <span class="keyword">...</span>
+    <span class="string">'LineWidth'</span>   , 1             );
+hold <span class="string">off</span>;
+printYesNo = 0;
+<span class="keyword">if</span> printYesNo == 1
+    saveFigurePath = [<span class="string">'/Users/kevin/SkyDrive/KTH Work/Period'</span> <span class="keyword">...</span>
+        <span class="string">' 3 2014/DN2255/Homework/5/Figures/'</span>];
+    addpath(saveFigurePath);
+    set(gcf, <span class="string">'PaperPositionMode'</span>, <span class="string">'auto'</span>);
+    print(<span class="string">'-depsc2'</span>, [saveFigurePath <span class="keyword">...</span>
+        sprintf(<span class="string">'frontTracking'</span>)]);
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Matlab Code
+% Front tracking Method
+%%
+clearvars;clc;
+myPath = ['/Users/kevin/SkyDrive/KTH Work/',...
+    'Period 3 2014/DN2255/Homework/5/matlab/'];
+cd(myPath);
+addpath(genpath(myPath));
+global n xc yc r
+%% Definitions
+n = 100;
+xc = 0;
+yc = -0.6;
+r = 0.3;
+L = 2;
+dx = L/(n-1);
+vec = -L/2:dx:L/2;
+[y,x] = meshgrid(vec,vec);
+c = 1;
+dt = 1*dx;
+tfinal = 2;
+totStep = ceil(tfinal/dt);
+%% Velocity Field
+u=-cos(pi*(x+0.5)).*sin(3*pi/8*y);
+v=sin(pi*(x+0.5)).*cos(3*pi/8*y);
+xv = vec;
+yv = vec;
+%% Define x and y on T
+theta = 0 : 2*pi/(n-1) : 2*pi;
+xT = r.*cos(theta) + xc;
+yT = r.*sin(theta) + yc;
+xplot(:,1) = xT;
+yplot(:,1) = yT;
+
+for tstep = 1:totStep;
+    for istep = 2:n-1
+        a = xT(istep);
+        b = yT(istep);
+        ix = find(xv<=a,1,'last');
+        jx = find(yv<=b,1,'last');
+        uab = ...
+            1/((xv(ix+1)-xv(ix))*(yv(jx+1)-yv(jx)))*...
+            (u(ix,jx)*(xv(ix+1)-a)*(yv(jx+1)-b) + ...
+            u(ix+1,jx)* (a-xv(ix)) * (yv(jx+1) - b) + ...
+            u(ix,jx+1)*(xv(ix+1)-a)*(b-yv(jx)) + ...
+            u(ix+1,jx+1)*(a-xv(ix))*(b-yv(jx)));
+        vab = ...
+            1/((xv(ix+1)-xv(ix))*(yv(jx+1)-yv(jx)))*...
+            (v(ix,jx)*(xv(ix+1)-a)*(yv(jx+1)-b) + ...
+            v(ix+1,jx)* (a-xv(ix)) * (yv(jx+1) - b) + ...
+            v(ix,jx+1)*(xv(ix+1)-a)*(b-yv(jx)) + ...
+            v(ix+1,jx+1)*(a-xv(ix))*(b-yv(jx)));
+        xTn(istep,tstep) = xT(istep) + c*dt*uab;
+        yTn(istep,tstep) = yT(istep) + c*dt*vab;
+        oxplot(istep,tstep) = xv(ix);
+        oyplot(istep,tstep) = yv(jx);
+        quplot(istep,tstep) = vab;
+        qvplot(istep,tstep) = uab;
+    end
+    xTn(1,tstep) = xTn(n-1,tstep);
+    yTn(1,tstep) = yTn(n-1,tstep);
+    xTn(n,tstep) = xTn(2,tstep);
+    yTn(n,tstep) = yTn(2,tstep);
+    xT = xTn(:,tstep)';
+    yT = yTn(:,tstep)';
+%     quiver(xq,yq,uq,vq)
+%     hold on;
+%     plot(xTn(:,tstep),yTn(:,tstep));
+%     axis([-L/2 L/2 -L/2 L/2])
+%     axis('square')
+%     hold off
+end
+
+%% Plot of all time figure 1
+q = 1:n/20:n;
+xq = x(q,q);
+yq = y(q,q);
+uq =  u(q,q);
+vq =  v(q,q);
+figure(1);clf;
+for ipp = 1:4:tstep-1;
+    quiver(xq,yq,uq,vq)
+    hold on;
+    plot(xTn(:,ipp),yTn(:,ipp));
+    axis([-L/2 L/2 -L/2 L/2])
+    axis('square')
+    hold off;
+    pause(0.1);
+end
+title('plot finished');
+%% Plot of discrete times figure 2
+n1 = 1;
+n2 = round(totStep/4  );
+n3 = round(totStep/2  );
+n4 = round(totStep*3/4);
+n5 = totStep;
+
+t1 = dt*n1;
+t2 = dt*n2;
+t3 = dt*n3;
+t4 = dt*n4;
+t5 = dt*n5;
+figure1;
+hold on;
+plot( ...
+	xTn(:,n1),yTn(:,n1),...
+    xTn(:,n2),yTn(:,n2),...
+    xTn(:,n3),yTn(:,n3),...
+    xTn(:,n4),yTn(:,n4),...
+    xTn(:,n5),yTn(:,n5))
+hold on;
+hXLabel = xlabel('x');
+hYLabel = ylabel('y');
+quiver(xq,yq,uq,vq)
+axis([-L/2 L/2 -L/2 L/2])
+axis('square')
+hText = text(-0.95,0,...
+    [sprintf('N = %g\n\\Deltat = 0.1\\Deltax',n) sprintf(' = %4.4f\n\\Deltax = L/(N-1) = %4.4f',dt,dx)],...
+    'EdgeColor',[0 0 0],...
+    'BackgroundColor',[1 1 1]);
+hLegend = legend(gca,...
+    sprintf('t = %0.2f s',t1),...
+    sprintf('t = %0.2f s',t2),...
+    sprintf('t = %0.2f s',t3),...
+    sprintf('t = %0.2f s',t4),...
+    sprintf('t = %0.2f s',t5),'location','SouthEast');
+hTitle = title(['Contour Plot of '...
+    sprintf('$\\mathbf{\\phi}$ with velocity vectors')],...
+    'Interpreter','latex');
+set( gca                       , ...
+    'FontName'   , 'Helvetica' );
+set([hTitle, hXLabel, hYLabel, hText], ...
+    'FontName'   , 'AvantGarde');
+set([hLegend, gca]             , ...
+    'FontSize'   , 8           );
+set([hXLabel, hYLabel, hText]  , ...
+    'FontSize'   , 10          );
+set( hTitle                    , ...
+    'FontSize'   , 12          , ...
+    'FontWeight' , 'bold'      );
+set(gca, ...
+    'Box'         , 'off'         , ...
+    'TickDir'     , 'out'         , ...
+    'TickLength'  , [.02 .02]     , ...
+    'XMinorTick'  , 'on'          , ...
+    'YMinorTick'  , 'on'          , ...
+    'YGrid'       , 'on',...
+    'XColor'      , [.3 .3 .3]    , ...
+    'YColor'      , [.3 .3 .3]    , ...
+    'LineWidth'   , 1             );
+hold off;
+printYesNo = 0;
+if printYesNo == 1
+    saveFigurePath = ['/Users/kevin/SkyDrive/KTH Work/Period' ...
+        ' 3 2014/DN2255/Homework/5/Figures/'];
+    addpath(saveFigurePath);
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-depsc2', [saveFigurePath ...
+        sprintf('frontTracking')]);
+end
+
+
+##### SOURCE END #####
+--></body></html>

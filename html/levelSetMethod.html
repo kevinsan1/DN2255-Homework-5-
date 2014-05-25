@@ -1,0 +1,364 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Level Set Method</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-05-25"><meta name="DC.source" content="levelSetMethod.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Level Set Method</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#3">Constants</a></li><li><a href="#4">Signed Distance Function</a></li><li><a href="#5">Define velocity field</a></li><li><a href="#6">Plotting variables</a></li><li><a href="#7">Main loop</a></li><li><a href="#9">Here's the progress bar code</a></li><li><a href="#11">Plot for print</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> [dt,dx,phiplot,X,Y,tplot,figure1] = levelSetMethod(dtfraction,myTextLabel)
+</pre><pre class="codeinput"><span class="keyword">global</span> n xc yc r;
+<span class="comment">% Long description</span>
+<span class="keyword">if</span> nargin &lt; 2
+    n=100;
+    dtfraction = 0.1;
+    myTextLabel = <span class="string">'0.1'</span>;
+<span class="keyword">end</span>
+</pre><h2>Constants<a name="3"></a></h2><pre class="codeinput">xc = 0;
+yc = -.6;
+r = 0.3;
+L = 2;
+dx = L/(n-1);
+dy = dx;
+<span class="comment">% Make grid of x and y values</span>
+[X, Y] = meshgrid(-L/2:dx:L/2,-L/2:dy:L/2);
+tFinal = 1.6;
+dt = dtfraction*dx;
+tSteps = ceil(tFinal/dt);
+ia = 1:n;
+im = [n,1:n-1];
+ip = [2:n,1];
+</pre><h2>Signed Distance Function<a name="4"></a></h2><pre class="codeinput">phi = signedDistance;
+</pre><h2>Define velocity field<a name="5"></a></h2><pre class="codeinput">u=-cos(pi*(X+0.5)).*sin(3*pi/8*Y);
+v=sin(pi*(X+0.5)).*cos(3*pi/8*Y);
+up = u;
+um = u;
+vp = v;
+vm = v;
+up(up&lt;=0) = 0;
+um(um&gt;=0) = 0;
+vp(vp&lt;=0) = 0;
+vm(vm&gt;=0) = 0;
+</pre><h2>Plotting variables<a name="6"></a></h2><pre class="codeinput">nplots = 20;        <span class="comment">% Desired number of plots</span>
+plotStep = round(tSteps/nplots); <span class="comment">% Number of steps between plots</span>
+iplot = 1;
+tplot(1) = 0;
+phinew = phi;
+phiplot(:,:,1) = phi;
+fx = zeros(n);
+fy = zeros(n);
+<span class="comment">% tplot = zeros(1,nplots);</span>
+myHandle = waitbar(0,<span class="string">'Initializing waitbar...'</span>);
+tic;
+</pre><h2>Main loop<a name="7"></a></h2><pre class="codeinput"><span class="keyword">for</span> tn = 1:tSteps
+</pre><pre class="codeinput">    <span class="keyword">for</span> i = 2:n-1
+        <span class="keyword">for</span> j = 2:n-1
+            wxm = phi(i,j) - phi(i-1,j);	<span class="comment">% x backward difference</span>
+            wxp = phi(i+1,j) - phi(i,j); 	<span class="comment">% x forward difference</span>
+            wym = phi(i,j) - phi(i,j-1); 	<span class="comment">% y backward difference</span>
+            wyp = phi(i,j+1) - phi(i,j); 	<span class="comment">% y forward difference</span>
+            fx(i,j) = vp(i,j)*wxm + vm(i,j)*wxp;
+            fy(i,j) = up(i,j)*wym + um(i,j)*wyp;
+            phinew(i,j) = phi(i,j)-dt*( fx(i,j)/dx + fy(i,j)/dy );
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="comment">% Set Boundary Conditions (no flux)</span>
+    phinew(1,:) = phinew(2,:);
+    phinew(:,1) = phinew(:,2);
+    phinew(n,:) = phinew(n-1,:);
+    phinew(:,n) = phinew(:,n-1);
+    phi = phinew;
+    phiplot(:,:,tn+1) = phi;
+    tplot(tn) = dt*tn;
+</pre><h2>Here's the progress bar code<a name="9"></a></h2><pre class="codeinput">    time=toc;
+    Perc=tn/tSteps;
+    Trem=time/Perc-time; <span class="comment">%Calculate the time remaining</span>
+    Hrs=floor(Trem/3600);Min=floor((Trem-Hrs*3600)/60);
+    waitbar(Perc,myHandle,[sprintf(<span class="string">'%0.1f'</span>,Perc*100) <span class="string">'%, '</span><span class="keyword">...</span>
+        sprintf(<span class="string">'%03.0f'</span>,Hrs) <span class="string">':'</span><span class="keyword">...</span>
+        sprintf(<span class="string">'%02.0f'</span>,Min) <span class="string">':'</span><span class="keyword">...</span>
+        sprintf(<span class="string">'%02.0f'</span>,rem(Trem,60)) <span class="string">' remaining Level Set Method'</span>]);
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><h2>Plot for print<a name="11"></a></h2><pre class="codeinput">qp = 1:round(n/20):n;
+totTime=length(tplot);
+n1 = 1;
+n2 = round(1/4*totTime);
+n3 = round(.5*totTime);
+n4 = round(3/4*totTime);
+n5 = totTime;
+
+t1 = tplot(n1);
+t2 = tplot(n2);
+t3 = tplot(n3);
+t4 = tplot(n4);
+t5 = tplot(n5);
+figure1=figure(<span class="string">'Units'</span>, <span class="string">'pixels'</span>, <span class="keyword">...</span>
+    <span class="string">'Position'</span>, [100 100 500 375]);hold <span class="string">on</span>;
+y1_plot = contour(X,Y,phiplot(:,:,n1),[0,0],<span class="string">'r'</span>); <span class="comment">% initial state</span>
+y2_plot = contour(X,Y,phiplot(:,:,n2),[0,0],<span class="string">'m'</span>); <span class="comment">% second state</span>
+y3_plot = contour(X,Y,phiplot(:,:,n3),[0,0],<span class="string">'color'</span>,[.2 .5 .9]); <span class="comment">% third state</span>
+y4_plot = contour(X,Y,phiplot(:,:,n4),[0,0],<span class="string">'b'</span>); <span class="comment">% fourth state</span>
+y5_plot = contour(X,Y,phiplot(:,:,n5),[0,0],<span class="string">'color'</span>,[.3 .3 .3]); <span class="comment">% final state</span>
+quivP = quiver(X(qp,qp),Y(qp,qp),u(qp,qp),v(qp,qp),<span class="keyword">...</span>
+    <span class="string">'color'</span>,[.5 .5 .5]);
+axis([-L/2 L/2 -L/2 L/2])
+axis(<span class="string">'square'</span>)
+hXLabel = xlabel(<span class="string">'x'</span>);
+hYLabel = ylabel(<span class="string">'y'</span>);
+<span class="comment">% Create axes</span>
+hText = text(-0.95,0,<span class="keyword">...</span>
+    [sprintf(<span class="string">'N = %g\n\\Deltat = '</span>,n) myTextLabel sprintf(<span class="string">' = %4.4f\n\\Deltax = L/(N-1) = %4.4f'</span>,dt,dx)],<span class="keyword">...</span>
+    <span class="string">'EdgeColor'</span>,[0 0 0],<span class="keyword">...</span>
+    <span class="string">'BackgroundColor'</span>,[1 1 1]);
+hLegend = legend(gca,<span class="keyword">...</span>
+    sprintf(<span class="string">'t = %0.2f s'</span>,t1),<span class="keyword">...</span>
+    sprintf(<span class="string">'t = %0.2f s'</span>,t2),<span class="keyword">...</span>
+    sprintf(<span class="string">'t = %0.2f s'</span>,t3),<span class="keyword">...</span>
+    sprintf(<span class="string">'t = %0.2f s'</span>,t4),<span class="keyword">...</span>
+    sprintf(<span class="string">'t = %0.2f s'</span>,t5),<span class="string">'location'</span>,<span class="string">'SouthEast'</span>);
+hTitle = title([<span class="string">'Contour Plot of '</span><span class="keyword">...</span>
+    sprintf(<span class="string">'$\\mathbf{\\phi}$ with velocity vectors'</span>)],<span class="keyword">...</span>
+    <span class="string">'Interpreter'</span>,<span class="string">'latex'</span>);
+set( gca                       , <span class="keyword">...</span>
+    <span class="string">'FontName'</span>   , <span class="string">'Helvetica'</span> );
+set([hTitle, hXLabel, hYLabel, hText], <span class="keyword">...</span>
+    <span class="string">'FontName'</span>   , <span class="string">'AvantGarde'</span>);
+set([hLegend, gca]             , <span class="keyword">...</span>
+    <span class="string">'FontSize'</span>   , 8           );
+set([hXLabel, hYLabel, hText]  , <span class="keyword">...</span>
+    <span class="string">'FontSize'</span>   , 10          );
+set( hTitle                    , <span class="keyword">...</span>
+    <span class="string">'FontSize'</span>   , 12          , <span class="keyword">...</span>
+    <span class="string">'FontWeight'</span> , <span class="string">'bold'</span>      );
+set(gca, <span class="keyword">...</span>
+    <span class="string">'Box'</span>         , <span class="string">'off'</span>         , <span class="keyword">...</span>
+    <span class="string">'TickDir'</span>     , <span class="string">'out'</span>         , <span class="keyword">...</span>
+    <span class="string">'TickLength'</span>  , [.02 .02]     , <span class="keyword">...</span>
+    <span class="string">'XMinorTick'</span>  , <span class="string">'on'</span>          , <span class="keyword">...</span>
+    <span class="string">'YMinorTick'</span>  , <span class="string">'on'</span>          , <span class="keyword">...</span>
+    <span class="string">'YGrid'</span>     ,<span class="string">'on'</span>,<span class="keyword">...</span>
+    <span class="string">'XColor'</span>      , [.3 .3 .3]    , <span class="keyword">...</span>
+    <span class="string">'YColor'</span>      , [.3 .3 .3]    , <span class="keyword">...</span>
+    <span class="string">'LineWidth'</span>   , 1             );
+hold <span class="string">off</span>;
+</pre><p>savePath = ['/Users/kevin/SkyDrive/'...     'KTH Work/Period 3 2014/DN2255/Homework/5/matlab/mat/']; save([savePath sprintf('dt_1-0050e-4',dt)],...     'X','Y','u','v','x','y','tSteps','phi','dt') save([savePath sprintf('dt1-0050e-4phiplot',dt)],...     'X','Y','u','v','x','y','tSteps','phiplot','dt')</p><pre class="codeinput"><span class="keyword">end</span> <span class="comment">% function</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Level Set Method
+% 
+%%
+function [dt,dx,phiplot,X,Y,tplot,figure1] = levelSetMethod(dtfraction,myTextLabel)
+global n xc yc r;
+% Long description
+if nargin < 2
+    n=100;
+    dtfraction = 0.1;
+    myTextLabel = '0.1';
+end
+%% Constants
+xc = 0;
+yc = -.6;
+r = 0.3;
+L = 2;
+dx = L/(n-1);
+dy = dx;
+% Make grid of x and y values
+[X, Y] = meshgrid(-L/2:dx:L/2,-L/2:dy:L/2);
+tFinal = 1.6;
+dt = dtfraction*dx;
+tSteps = ceil(tFinal/dt);
+ia = 1:n;
+im = [n,1:n-1];
+ip = [2:n,1];
+%% Signed Distance Function
+phi = signedDistance;
+%% Define velocity field
+u=-cos(pi*(X+0.5)).*sin(3*pi/8*Y);
+v=sin(pi*(X+0.5)).*cos(3*pi/8*Y);
+up = u;
+um = u;
+vp = v;
+vm = v;
+up(up<=0) = 0;
+um(um>=0) = 0;
+vp(vp<=0) = 0;
+vm(vm>=0) = 0;
+
+%% Plotting variables
+nplots = 20;        % Desired number of plots
+plotStep = round(tSteps/nplots); % Number of steps between plots
+iplot = 1;
+tplot(1) = 0;
+phinew = phi;
+phiplot(:,:,1) = phi;
+fx = zeros(n);
+fy = zeros(n);
+% tplot = zeros(1,nplots);
+myHandle = waitbar(0,'Initializing waitbar...');
+tic;
+%% Main loop
+for tn = 1:tSteps
+    for i = 2:n-1
+        for j = 2:n-1
+            wxm = phi(i,j) - phi(i-1,j);	% x backward difference
+            wxp = phi(i+1,j) - phi(i,j); 	% x forward difference
+            wym = phi(i,j) - phi(i,j-1); 	% y backward difference
+            wyp = phi(i,j+1) - phi(i,j); 	% y forward difference
+            fx(i,j) = vp(i,j)*wxm + vm(i,j)*wxp;
+            fy(i,j) = up(i,j)*wym + um(i,j)*wyp;
+            phinew(i,j) = phi(i,j)-dt*( fx(i,j)/dx + fy(i,j)/dy );
+        end
+    end
+    % Set Boundary Conditions (no flux)
+    phinew(1,:) = phinew(2,:);
+    phinew(:,1) = phinew(:,2);
+    phinew(n,:) = phinew(n-1,:);
+    phinew(:,n) = phinew(:,n-1);
+    phi = phinew;
+    phiplot(:,:,tn+1) = phi; 
+    tplot(tn) = dt*tn;
+        %% Here's the progress bar code
+    time=toc;
+    Perc=tn/tSteps;
+    Trem=time/Perc-time; %Calculate the time remaining
+    Hrs=floor(Trem/3600);Min=floor((Trem-Hrs*3600)/60);
+    waitbar(Perc,myHandle,[sprintf('%0.1f',Perc*100) '%, '...
+        sprintf('%03.0f',Hrs) ':'...
+        sprintf('%02.0f',Min) ':'...
+        sprintf('%02.0f',rem(Trem,60)) ' remaining Level Set Method']);
+end
+%% Plot for print
+
+
+qp = 1:round(n/20):n;
+totTime=length(tplot);
+n1 = 1;
+n2 = round(1/4*totTime);
+n3 = round(.5*totTime);
+n4 = round(3/4*totTime);
+n5 = totTime;
+
+t1 = tplot(n1);
+t2 = tplot(n2);
+t3 = tplot(n3);
+t4 = tplot(n4);
+t5 = tplot(n5);
+figure1=figure('Units', 'pixels', ...
+    'Position', [100 100 500 375]);hold on;
+y1_plot = contour(X,Y,phiplot(:,:,n1),[0,0],'r'); % initial state
+y2_plot = contour(X,Y,phiplot(:,:,n2),[0,0],'m'); % second state
+y3_plot = contour(X,Y,phiplot(:,:,n3),[0,0],'color',[.2 .5 .9]); % third state
+y4_plot = contour(X,Y,phiplot(:,:,n4),[0,0],'b'); % fourth state
+y5_plot = contour(X,Y,phiplot(:,:,n5),[0,0],'color',[.3 .3 .3]); % final state
+quivP = quiver(X(qp,qp),Y(qp,qp),u(qp,qp),v(qp,qp),...
+    'color',[.5 .5 .5]);
+axis([-L/2 L/2 -L/2 L/2])
+axis('square')
+hXLabel = xlabel('x');
+hYLabel = ylabel('y');
+% Create axes
+hText = text(-0.95,0,...
+    [sprintf('N = %g\n\\Deltat = ',n) myTextLabel sprintf(' = %4.4f\n\\Deltax = L/(N-1) = %4.4f',dt,dx)],...
+    'EdgeColor',[0 0 0],...
+    'BackgroundColor',[1 1 1]);
+hLegend = legend(gca,...
+    sprintf('t = %0.2f s',t1),...
+    sprintf('t = %0.2f s',t2),...
+    sprintf('t = %0.2f s',t3),...
+    sprintf('t = %0.2f s',t4),...
+    sprintf('t = %0.2f s',t5),'location','SouthEast');
+hTitle = title(['Contour Plot of '...
+    sprintf('$\\mathbf{\\phi}$ with velocity vectors')],...
+    'Interpreter','latex');
+set( gca                       , ...
+    'FontName'   , 'Helvetica' );
+set([hTitle, hXLabel, hYLabel, hText], ...
+    'FontName'   , 'AvantGarde');
+set([hLegend, gca]             , ...
+    'FontSize'   , 8           );
+set([hXLabel, hYLabel, hText]  , ...
+    'FontSize'   , 10          );
+set( hTitle                    , ...
+    'FontSize'   , 12          , ...
+    'FontWeight' , 'bold'      );
+set(gca, ...
+    'Box'         , 'off'         , ...
+    'TickDir'     , 'out'         , ...
+    'TickLength'  , [.02 .02]     , ...
+    'XMinorTick'  , 'on'          , ...
+    'YMinorTick'  , 'on'          , ...
+    'YGrid'     ,'on',...
+    'XColor'      , [.3 .3 .3]    , ...
+    'YColor'      , [.3 .3 .3]    , ...
+    'LineWidth'   , 1             );
+hold off;
+%%
+% savePath = ['/Users/kevin/SkyDrive/'...
+%     'KTH Work/Period 3 2014/DN2255/Homework/5/matlab/mat/'];
+% save([savePath sprintf('dt_1-0050e-4',dt)],...
+%     'X','Y','u','v','x','y','tSteps','phi','dt')
+% save([savePath sprintf('dt1-0050e-4phiplot',dt)],...
+%     'X','Y','u','v','x','y','tSteps','phiplot','dt')
+end % function
+
+##### SOURCE END #####
+--></body></html>

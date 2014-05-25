@@ -1,3 +1,6 @@
+%% Matlab Code
+% 
+%% Front tracking Method
 clearvars;clc;
 myPath = ['/Users/kevin/SkyDrive/KTH Work/',...
     'Period 3 2014/DN2255/Homework/5/matlab/'];
